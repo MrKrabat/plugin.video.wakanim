@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <setting id="wakanim_username" type="text" label="30001" default=""/>
+    <setting id="wakanim_password" type="text" label="30002" option="hidden" default=""/>
+    <setting type="sep" />
+    <setting id="video_quality" type="select" lvalues="30009|30008" label="30003" default="0" />
+</settings>

@@ -1,0 +1,93 @@
+# XBMC Media Center language file
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2013-07-17 09:48+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+# Wakanim Settings
+
+msgctxt "#30001"
+msgid "Username"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Password"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Video quality"
+msgstr ""
+
+msgctxt "#30004"
+msgid "360 (Mobil)"
+msgstr ""
+
+msgctxt "#30005"
+msgid "360p (SD)"
+msgstr ""
+
+msgctxt "#30006"
+msgid "480p"
+msgstr ""
+
+msgctxt "#30007"
+msgid "540p"
+msgstr ""
+
+msgctxt "#30008"
+msgid "720p (HD)"
+msgstr ""
+
+msgctxt "#30009"
+msgid "1080p (FullHD)"
+msgstr ""
+
+
+# Wakanim Menue
+
+msgctxt "#30020"
+msgid "Catalog"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30022"
+msgid "My downloads"
+msgstr ""
+
+msgctxt "#30023"
+msgid "My collection"
+msgstr ""
+
+# Wakanim Messages
+
+msgctxt "#30040"
+msgid "Login failed"
+msgstr ""
+
+msgctxt "#30041"
+msgid "An error occurred"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Reactivation failed of this video"
+msgstr ""
+
+msgctxt "#30043"
+msgid "You need to be premium or own this video"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Failed to play video or stream"
+msgstr ""
