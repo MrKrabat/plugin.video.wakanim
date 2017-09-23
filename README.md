@@ -25,6 +25,7 @@ Devices running an older Kodi version will only support videos you bought.
 ***
 
 What this plugin currently can do:
+- [x] Supports Wakanim France, Germany and Nordic
 - [x] Login with your account
 - [x] Search for animes
 - [x] Show "My Downloads" (untested)

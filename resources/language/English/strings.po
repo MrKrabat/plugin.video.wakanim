@@ -45,7 +45,7 @@ msgid "2160p (UDH 4K)"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Country"
+msgid "Region"
 msgstr ""
 
 msgctxt "#30011"
@@ -53,7 +53,11 @@ msgid "Germany"
 msgstr ""
 
 msgctxt "#30012"
-msgid "France"
+msgid "France, Belgium, Switzerland, Quebec"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Sweden, Norway, Iceland, Finland, Denmark"
 msgstr ""
 
 

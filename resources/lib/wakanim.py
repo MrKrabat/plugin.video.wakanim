@@ -42,8 +42,10 @@ def main():
 		args._country = 'de'
 	elif args._country == '1':
 		args._country = 'fr'
+	elif args._country == '2':
+		args._country = 'sc'
 	else:
-		args._country = 'fr'
+		args._country = 'de'
 
 	if username == "" or password == "":
 		# open addon settings

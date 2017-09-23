@@ -170,10 +170,10 @@ def listSeason(args):
 
 	soup = BeautifulSoup(html, 'html.parser')
 
-	for section in soup.find_all("h2", {"class": "slider-section_title"})[:-2]:
-		title = section.get_text()[6:].strip()
-		if title == 'ue':
+	for section in soup.find_all("h2", {"class": "slider-section_title"}):
+		if not section.span:
 			continue
+		title = section.get_text()[6:].strip()
 
 		list.add_item(args,
 						{'url':			args.url,
@@ -234,7 +234,7 @@ def startplayback(args):
 	soup = BeautifulSoup(html, 'html.parser')
 
 	# check if not premium
-	if ('Diese Folge ist für Abonnenten reserviert' in html) or ('Cet épisode est reservé à nos abonnés' in html):
+	if ('Diese Folge ist für Abonnenten reserviert' in html) or ('Cet épisode est reservé à nos abonnés' in html) or ('This episode is reserved for our subscribers' in html):
 		xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
 		xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
 		return
@@ -271,9 +271,9 @@ def startplayback(args):
 		"""
 
 	# using stream with hls
-	elif ('Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen' in html) or ('Changer de lecteur' in html):
+	elif ('Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen' in html) or ('Changer de lecteur' in html) or ('Our player is in beta, click here to go back to the old one' in html):
 		# streaming is only for premium subscription
-		if ('<span>Kostenlos</span>' in html) or ('<span>Gratuit</span>' in html):
+		if ('<span>Kostenlos</span>' in html) or ('<span>Gratuit</span>' in html) or ('<span>Free</span>' in html):
 			xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
 			xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
 			return
