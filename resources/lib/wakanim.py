@@ -45,7 +45,7 @@ def main():
 		success = login.login(username, password, args)
 		if success==True:
 			# list menue
-			xbmcplugin.setContent(int(sys.argv[1]), 'movies')
+			xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
 			check_mode(args)
 		else:
 			# login failed
@@ -57,7 +57,20 @@ def main():
 def check_mode(args):
 	"""Run mode-specific functions
 	"""
-	mode = args.mode
+	try:
+		mode = args.mode
+	except:
+		# call from other plugin
+		mode = 'videoplay'
+		args.name = 'Video'
+		args.episode, args.rating, args.plot, args.year, args.icon = ('None',)*5
+		
+		if hasattr(args,'id'):
+			args.url = '/de/v2/catalogue/episode/' + id
+		elif hasattr(args,'url'):
+			args.url = args.url[22:]
+		else:
+			mode = None
 
 	if mode is None:
 		showMainMenue(args)

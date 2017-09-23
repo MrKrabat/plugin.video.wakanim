@@ -7,7 +7,7 @@ Git Repo: https://github.com/MrKrabat/plugin.video.wakanim_de
 
 Forum Posting: --
 
-**This Plugin is ONLY for german visitors of Wakanim.tv!**
+**This plugin is ONLY for german visitors of Wakanim.tv!**
 
 **WARNING: You MUST be a PREMIUM member OR buy videos to use this plugin!**
 ***
