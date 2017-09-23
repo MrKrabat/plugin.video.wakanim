@@ -36,6 +36,15 @@ def main():
 	username = args._addon.getSetting("wakanim_username")
 	password = args._addon.getSetting("wakanim_password")
 
+	# set country
+	args._country = args._addon.getSetting("country")
+	if args._country == '0':
+		args._country = 'de'
+	elif args._country == '1':
+		args._country = 'fr'
+	else:
+		args._country = 'fr'
+
 	if username == "" or password == "":
 		# open addon settings
 		args._addon.openSettings()
@@ -64,9 +73,9 @@ def check_mode(args):
 		mode = 'videoplay'
 		args.name = 'Video'
 		args.episode, args.rating, args.plot, args.year, args.icon = ('None',)*5
-		
+
 		if hasattr(args,'id'):
-			args.url = '/de/v2/catalogue/episode/' + id
+			args.url = '/' + args._country + '/v2/catalogue/episode/' + id
 		elif hasattr(args,'url'):
 			args.url = args.url[22:]
 		else:

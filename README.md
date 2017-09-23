@@ -3,11 +3,9 @@
 Wakanim
 A KODI (XBMC) plugin for Wakanim. 
 
-Git Repo: https://github.com/MrKrabat/plugin.video.wakanim_de
+Git Repo: https://github.com/MrKrabat/plugin.video.wakanim
 
 Forum Posting: --
-
-**This plugin is ONLY for german visitors of Wakanim.tv!**
 
 **WARNING: You MUST be a PREMIUM member OR buy videos to use this plugin!**
 ***
@@ -29,8 +27,8 @@ Devices running an older Kodi version will only support videos you bought.
 What this plugin currently can do:
 - [x] Login with your account
 - [x] Search for animes
-- [x] Show "My Downloads"
-- [x] Show "My Collection"
+- [x] Show "My Downloads" (untested)
+- [x] Show "My Collection" (untested)
 - [x] Show/browse all available anime
 - [x] Show/browse all seasons/arcs of an anime
 - [x] Show/browse all episodes of an season/arc
@@ -38,8 +36,8 @@ What this plugin currently can do:
 - [x] Watch videos with premium subscription
 
 What is planned for the future:
-- [ ] Watch videos you have bought
-- [ ] Select video resolution (only for videos you bought)
+- [ ] Watch videos you have bought (deactivated, untested)
+- [ ] Select video resolution (only for videos you bought, streams are adaptive)
 
 ***
 

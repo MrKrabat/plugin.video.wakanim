@@ -20,7 +20,7 @@ import xbmc
 import xbmcaddon
 
 
-_plugId = 'plugin.video.wakanim_de'
+_plugId = 'plugin.video.wakanim'
 
 # plugin constants
 __addon__  = xbmcaddon.Addon(id=_plugId)

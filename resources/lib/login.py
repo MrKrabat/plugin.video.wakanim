@@ -26,7 +26,7 @@ import xbmc
 def login(username, password, args):
 	"""Login and session handler
 	"""
-	login_url = 'https://www.wakanim.tv/de/v2/account/login?ReturnUrl=%2Fde%2Fv2%2Fdiscover'
+	login_url = 'https://www.wakanim.tv/' + args._country + '/v2/account/login?ReturnUrl=%2Fde%2Fv2%2Fdiscover'
 
 	# create cookie path
 	cookiepath = os.path.join(
@@ -47,10 +47,10 @@ def login(username, password, args):
 		cj.load(cookiepath, ignore_discard=True)
 
 		#check if session is valid
-		response = urllib2.urlopen('https://www.wakanim.tv/de/v2/catalogue')
+		response = urllib2.urlopen('https://www.wakanim.tv/' + args._country + '/v2/catalogue')
 		html = response.read()
 
-		if 'Meine Benachrichtigungen verwalten' in html:
+		if ('Meine Benachrichtigungen verwalten' in html) or ('Gérer mes notifications' in html):
 			#session is valid
 			return True
 
@@ -70,7 +70,7 @@ def login(username, password, args):
 	#check for login string
 	html = response.read()
 
-	if 'Meine Benachrichtigungen verwalten' in html:
+	if ('Meine Benachrichtigungen verwalten' in html) or ('Gérer mes notifications' in html):
 		#save session to disk
 		cj.save(cookiepath, ignore_discard=True)
 		return True

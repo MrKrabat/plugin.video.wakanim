@@ -13,6 +13,7 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
+
 # Wakanim Settings
 
 msgctxt "#30001"
@@ -28,28 +29,32 @@ msgid "Video quality"
 msgstr "Video Qualität"
 
 msgctxt "#30004"
-msgid "360p (Mobil)"
-msgstr "360p (Mobil)"
-
-msgctxt "#30005"
-msgid "360p (SD)"
-msgstr "360p (SD)"
-
-msgctxt "#30006"
-msgid "480p"
-msgstr "480p"
-
-msgctxt "#30007"
-msgid "540p"
-msgstr "540p"
-
-msgctxt "#30008"
 msgid "720p (HD)"
 msgstr "720p (HD)"
 
-msgctxt "#30009"
+msgctxt "#30005"
 msgid "1080p (FullHD)"
 msgstr "1080p (FullHD)"
+
+msgctxt "#30006"
+msgid "1440p (QHD 2K)"
+msgstr "1440p (QHD 2K)"
+
+msgctxt "#30007"
+msgid "2160p (UDH 4K)"
+msgstr "2160p (UDH 4K)"
+
+msgctxt "#30010"
+msgid "Country"
+msgstr "Land"
+
+msgctxt "#30011"
+msgid "Germany"
+msgstr "Deutschland"
+
+msgctxt "#30012"
+msgid "France"
+msgstr "Frankreich"
 
 
 # Wakanim Menue
@@ -70,6 +75,7 @@ msgctxt "#30023"
 msgid "My collection"
 msgstr "Meine Sammlung"
 
+
 # Wakanim Messages
 
 msgctxt "#30040"
@@ -79,10 +85,6 @@ msgstr "Login fehlgeschlagen"
 msgctxt "#30041"
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
-
-msgctxt "#30042"
-msgid "Reactivation failed of this video"
-msgstr "Reaktivierung fehlgeschlagen dieses Videos"
 
 msgctxt "#30043"
 msgid "You need to be premium or own this video"

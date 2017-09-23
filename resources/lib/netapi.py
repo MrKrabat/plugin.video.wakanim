@@ -30,7 +30,7 @@ import list
 def showCatalog(args):
 	"""Show all animes
 	"""
-	response = urllib2.urlopen('https://www.wakanim.tv/de/v2/catalogue')
+	response = urllib2.urlopen('https://www.wakanim.tv/' + args._country + '/v2/catalogue')
 	html = response.read()
 
 	soup = BeautifulSoup(html, 'html.parser')
@@ -69,7 +69,7 @@ def searchAnime(args):
 		return
 
 	post_data = urllib.urlencode({'search': d})
-	response = urllib2.urlopen('https://www.wakanim.tv/de/v2/catalogue/search', post_data)
+	response = urllib2.urlopen('https://www.wakanim.tv/' + args._country + '/v2/catalogue/search', post_data)
 	html = response.read()
 
 	soup = BeautifulSoup(html, 'html.parser')
@@ -107,7 +107,7 @@ def myDownloads(args):
 	"""View download able animes
 	May not every episode is download able.
 	"""
-	response = urllib2.urlopen('https://www.wakanim.tv/de/v2/mydownloads')
+	response = urllib2.urlopen('https://www.wakanim.tv/' + args._country + '/v2/mydownloads')
 	html = response.read()
 
 	soup = BeautifulSoup(html, 'html.parser')
@@ -136,7 +136,7 @@ def myDownloads(args):
 def myCollection(args):
 	"""View collection
 	"""
-	response = urllib2.urlopen('https://www.wakanim.tv/de/v2/collection')
+	response = urllib2.urlopen('https://www.wakanim.tv/' + args._country + '/v2/collection')
 	html = response.read()
 
 	soup = BeautifulSoup(html, 'html.parser')
@@ -170,14 +170,16 @@ def listSeason(args):
 
 	soup = BeautifulSoup(html, 'html.parser')
 
-	#body > section.serie_selects > div > div > div > div > span > select
-	for section in soup.find_all("h2", {"class": "slider-section_title"})[:-1]:
+	for section in soup.find_all("h2", {"class": "slider-section_title"})[:-2]:
 		title = section.get_text()[6:].strip()
+		if title == 'ue':
+			continue
+
 		list.add_item(args,
 						{'url':			args.url,
-						'title':		title,
+						'title':		title.encode('utf-8'),
 						'mode':			'list_episodes',
-						'season':		title,
+						'season':		title.encode('utf-8'),
 						'thumb':		args.icon,
 						'fanart_image':	args.fanart,
 						'episode':		args.episode,
@@ -209,7 +211,7 @@ def listEpisodes(args):
 
 		list.add_item(args,
 						{'url':			parent.a['href'],
-						'title':		parent.img['alt'],
+						'title':		parent.img['alt'].encode('utf-8'),
 						'mode':			'videoplay',
 						'thumb':		thumb,
 						'fanart_image':	args.fanart,
@@ -232,15 +234,15 @@ def startplayback(args):
 	soup = BeautifulSoup(html, 'html.parser')
 
 	# check if not premium
-	if 'Diese Folge ist für Abonnenten reserviert' in html:
+	if ('Diese Folge ist für Abonnenten reserviert' in html) or ('Cet épisode est reservé à nos abonnés' in html):
 		xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
 		xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
 		return
-		
+
 	# videos are only served if ads where loaded
-	regex = r"episode\/(.*?)\/"
-	id = re.search(regex, args.url).group(1)
-	urllib2.urlopen('https://www.wakanim.tv/de/v2/video/advertisement?idepisode=' + id).read()
+	#regex = r"episode\/(.*?)\/"
+	#id = re.search(regex, args.url).group(1)
+	#urllib2.urlopen('https://www.wakanim.tv/' + args._country + '/v2/video/advertisement?idepisode=' + id).read()
 
 	# prefer using download able videos
 	if 'episode_download_buttons' in html and 1==0: # TODO
@@ -269,7 +271,13 @@ def startplayback(args):
 		"""
 
 	# using stream with hls
-	elif 'Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen' in html:
+	elif ('Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen' in html) or ('Changer de lecteur' in html):
+		# streaming is only for premium subscription
+		if ('<span>Kostenlos</span>' in html) or ('<span>Gratuit</span>' in html):
+			xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
+			xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
+			return
+
 		# get stream file
 		regex = r"file: \"(.*?)\","
 		matches = re.search(regex, html).group(1)
