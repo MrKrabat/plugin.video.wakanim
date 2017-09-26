@@ -20,8 +20,6 @@ Compatibility
 | Android | 17.x  | Yes  |
 | RaspberryPi | 17.x  | Yes  |
 | iOS | 17.x  | untested  |
-
-Devices running an older Kodi version will only support videos you bought.
 ***
 
 What this plugin currently can do:
@@ -41,6 +39,8 @@ What is planned for the future:
 - [ ] Select video resolution (only for videos you bought, streams are adaptive)
 
 ***
+
+_This website and addon is not affiliated with Wakanim._
 
 _Kodi® (formerly known as XBMC™) is a registered trademark of the XBMC Foundation. 
 This website and addon is not affiliated with Kodi, Team Kodi, or the XBMC Foundation._
