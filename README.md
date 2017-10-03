@@ -1,11 +1,10 @@
 # Wakanim plugin for Kodi
 
-Wakanim
-A KODI (XBMC) plugin for Wakanim. 
+Wakanim a KODI (XBMC) plugin for Wakanim.tv. 
 
-Git Repo: https://github.com/MrKrabat/plugin.video.wakanim
+Git repo: https://github.com/MrKrabat/plugin.video.wakanim
 
-Forum Posting: --
+Forum posting: https://www.kodinerds.net/index.php/Thread/58348-Release-Wakanim-tv/
 
 **WARNING: You MUST be a PREMIUM member OR buy videos to use this plugin!**
 ***
