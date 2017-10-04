@@ -20,40 +20,40 @@ import urllib
 
 
 def parse_args():
-	"""Decode arguments.
-	"""
-	if (sys.argv[2]):
-		return Args(**dict([p.split('=')
-								for p in sys.argv[2][1:].split('&')]))
+    """Decode arguments.
+    """
+    if (sys.argv[2]):
+        return Args(**dict([p.split("=")
+                                for p in sys.argv[2][1:].split("&")]))
 
-	else:
-		# Args will turn the 'None' into None.
-		# Don't simply define it as None because unquote_plus in updateArgs
-		# will throw an exception.
-		# This is a pretty ugly solution.
-		return Args(mode = 'None',
-					url  = 'None',
-					name = 'None')
+    else:
+        # Args will turn the "None" into None.
+        # Don"t simply define it as None because unquote_plus in updateArgs
+        # will throw an exception.
+        # This is a pretty ugly solution.
+        return Args(mode = "None",
+                    url  = "None",
+                    name = "None")
 
 
 class Args(object):
-	"""Arguments class.
-	Hold all arguments passed to the script and also persistent user data and
-	reference to the addon. It is intended to hold all data necessary for the
-	script.
-	"""
-	def __init__(self, *args, **kwargs):
-		"""Initialize arguments object.
-		Hold also references to the addon which can't be kept at module level.
-		"""
-		self._addon = sys.modules['__main__'].__addon__
-		self._addonname = sys.modules['__main__'].__plugin__
-		self._addonid    = sys.modules['__main__']._plugId
-		self._cj    = None
+    """Arguments class.
+    Hold all arguments passed to the script and also persistent user data and
+    reference to the addon. It is intended to hold all data necessary for the
+    script.
+    """
+    def __init__(self, *args, **kwargs):
+        """Initialize arguments object.
+        Hold also references to the addon which can"t be kept at module level.
+        """
+        self._addon     = sys.modules["__main__"].__addon__
+        self._addonname = sys.modules["__main__"].__plugin__
+        self._addonid   = sys.modules["__main__"]._plugId
+        self._cj        = None
 
-		for key, value in kwargs.iteritems():
-			if value == 'None':
-				kwargs[key] = None
-			else:
-				kwargs[key] = urllib.unquote_plus(kwargs[key])
-		self.__dict__.update(kwargs)
+        for key, value in kwargs.iteritems():
+            if value == "None":
+                kwargs[key] = None
+            else:
+                kwargs[key] = urllib.unquote_plus(kwargs[key])
+        self.__dict__.update(kwargs)

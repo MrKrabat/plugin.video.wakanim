@@ -1,6 +1,6 @@
 # Wakanim plugin for Kodi
 
-Wakanim a KODI (XBMC) plugin for Wakanim.tv. 
+Wakanim a KODI (XBMC) plugin for Wakanim.tv.
 
 Git repo: https://github.com/MrKrabat/plugin.video.wakanim
 
@@ -17,8 +17,8 @@ Compatibility
 | Linux | 17.x  | Yes  |
 | MacOS | 17.x  | untested  |
 | Android | 17.x  | Yes  |
-| RaspberryPi | 17.x  | Yes  |
 | iOS | 17.x  | untested  |
+| RaspberryPi | 17.x  | Yes  |
 ***
 
 What this plugin currently can do:
@@ -41,5 +41,5 @@ What is planned for the future:
 
 _This website and addon is not affiliated with Wakanim._
 
-_Kodi® (formerly known as XBMC™) is a registered trademark of the XBMC Foundation. 
+_Kodi® (formerly known as XBMC™) is a registered trademark of the XBMC Foundation.
 This website and addon is not affiliated with Kodi, Team Kodi, or the XBMC Foundation._
