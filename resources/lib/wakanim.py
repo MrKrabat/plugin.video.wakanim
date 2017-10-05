@@ -110,15 +110,15 @@ def showMainMenue(args):
     """Show main menu
     """
     list.add_item(args,
-            {"title": args._addon.getLocalizedString(30020),
-            "mode":   "catalog"})
+                  {"title": args._addon.getLocalizedString(30020),
+                   "mode":   "catalog"})
     list.add_item(args,
-            {"title": args._addon.getLocalizedString(30021),
-            "mode":   "search"})
+                  {"title": args._addon.getLocalizedString(30021),
+                   "mode":   "search"})
     list.add_item(args,
-            {"title": args._addon.getLocalizedString(30022),
-            "mode":   "downloads"})
+                  {"title": args._addon.getLocalizedString(30022),
+                   "mode":   "downloads"})
     list.add_item(args,
-            {"title": args._addon.getLocalizedString(30023),
-            "mode":   "collection"})
+                  {"title": args._addon.getLocalizedString(30023),
+                   "mode":   "collection"})
     list.endofdirectory()
