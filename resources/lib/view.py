@@ -44,15 +44,26 @@ def add_item(args, info, isFolder=True, total_items=0, queued=False, rex=re.comp
     li = xbmcgui.ListItem(label          = info["title"],
                           iconImage      = info["thumb"],
                           thumbnailImage = info["thumb"])
-    li.setInfo(type       = mediatype,
-               infoLabels = {"mediatype": "video",
-                             "title":     info["title"],
-                             "plot":      info["plot"],
-                             "year":      info["year"],
-                             "episode":   info["episode"],
-                             "season":    info["season"],
-                             "rating":    info["rating"],
-                             "genre":     "Anime"})
+    if isFolder:
+        li.setInfo(type       = mediatype,
+                   infoLabels = {"title":     info["title"],
+                                 "plot":      info["plot"],
+                                 "year":      info["year"],
+                                 "episode":   info["episode"],
+                                 "season":    info["season"],
+                                 "rating":    info["rating"],
+                                 "genre":     "Anime"})
+    else:
+        li.setInfo(type       = mediatype,
+                   infoLabels = {"mediatype": "video",
+                                 "title":     info["title"],
+                                 "plot":      info["plot"],
+                                 "year":      info["year"],
+                                 "episode":   info["episode"],
+                                 "season":    info["season"],
+                                 "rating":    info["rating"],
+                                 "genre":     "Anime"})
+
     li.setArt({"thumb":  info["thumb"],
                "poster": info["thumb"],
                "banner": info["thumb"],
