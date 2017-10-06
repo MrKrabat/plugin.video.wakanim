@@ -45,14 +45,19 @@ def add_item(args, info, isFolder=True, total_items=0, queued=False, rex=re.comp
                           iconImage      = info["thumb"],
                           thumbnailImage = info["thumb"])
     li.setInfo(type       = mediatype,
-               infoLabels = {"title":   info["title"],
-                             "plot":    info["plot"],
-                             "year":    info["year"],
-                             "episode": info["episode"],
-                             "season":  info["season"],
-                             "rating":  info["rating"],
-                             "genre":   "Anime"})
-    li.setProperty("Fanart_Image", info["fanart_image"])
+               infoLabels = {"mediatype": "tvshow",
+                             "title":     info["title"],
+                             "plot":      info["plot"],
+                             "year":      info["year"],
+                             "episode":   info["episode"],
+                             "season":    info["season"],
+                             "rating":    info["rating"],
+                             "genre":     "Anime"})
+    li.setArt({"thumb":  info["thumb"],
+               "poster": info["thumb"],
+               "banner": info["thumb"],
+               "fanart": info["fanart_image"],
+               "icon":   info["thumb"]})
 
     # Add item to list
     xbmcplugin.addDirectoryItem(handle     = int(sys.argv[1]),

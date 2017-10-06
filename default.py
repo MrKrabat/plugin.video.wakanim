@@ -23,11 +23,11 @@ import xbmcaddon
 _plugId = "plugin.video.wakanim"
 
 # plugin constants
-__addon__   = xbmcaddon.Addon(id=_plugId)
-__plugin__  = __addon__.getAddonInfo("name")
-__version__ = __addon__.getAddonInfo("version")
+_addon   = xbmcaddon.Addon(id=_plugId)
+_plugin  = _addon.getAddonInfo("name")
+_version = _addon.getAddonInfo("version")
 
-xbmc.log("[PLUGIN] %s: version %s initialized" % (__plugin__, __version__))
+xbmc.log("[PLUGIN] %s: version %s initialized" % (_plugin, _version))
 
 if __name__ == "__main__":
     from resources.lib import wakanim

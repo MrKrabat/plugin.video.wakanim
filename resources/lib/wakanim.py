@@ -24,7 +24,7 @@ import xbmcplugin
 import cmdargs
 import login
 import netapi
-import list
+import view
 
 
 def main():
@@ -47,14 +47,14 @@ def main():
     else:
         args._country = "de"
 
-    if (username == "") or (password == ""):
+    if not (username and password):
         # open addon settings
         args._addon.openSettings()
         return False
     else:
         # login
         success = login.login(username, password, args)
-        if success == True:
+        if success:
             # list menue
             xbmcplugin.setContent(int(sys.argv[1]), "tvshows")
             check_mode(args)
@@ -68,9 +68,9 @@ def main():
 def check_mode(args):
     """Run mode-specific functions
     """
-    try:
+    if hasattr(args, "mode"):
         mode = args.mode
-    except:
+    else:
         # call from other plugin
         mode = "videoplay"
         args.name = "Video"
@@ -109,16 +109,16 @@ def check_mode(args):
 def showMainMenue(args):
     """Show main menu
     """
-    list.add_item(args,
+    view.add_item(args,
                   {"title": args._addon.getLocalizedString(30020),
                    "mode":   "catalog"})
-    list.add_item(args,
+    view.add_item(args,
                   {"title": args._addon.getLocalizedString(30021),
                    "mode":   "search"})
-    list.add_item(args,
+    view.add_item(args,
                   {"title": args._addon.getLocalizedString(30022),
                    "mode":   "downloads"})
-    list.add_item(args,
+    view.add_item(args,
                   {"title": args._addon.getLocalizedString(30023),
                    "mode":   "collection"})
-    list.endofdirectory()
+    view.endofdirectory()

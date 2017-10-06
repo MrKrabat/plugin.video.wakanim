@@ -24,7 +24,7 @@ import xbmc
 import xbmcgui
 
 import login
-import list
+import view
 
 
 def showCatalog(args):
@@ -44,7 +44,7 @@ def showCatalog(args):
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
-        list.add_item(args,
+        view.add_item(args,
                       {"url":          li.a["href"],
                        "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.encode("utf-8"),
                        "mode":         "list_season",
@@ -58,7 +58,7 @@ def showCatalog(args):
                       isFolder=True, mediatype="video")
 
 
-    list.endofdirectory()
+    view.endofdirectory()
 
 
 def searchAnime(args):
@@ -75,7 +75,7 @@ def searchAnime(args):
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
     if not ul:
-        list.endofdirectory()
+        view.endofdirectory()
         return
 
     for li in ul.find_all("li"):
@@ -86,7 +86,7 @@ def searchAnime(args):
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
-        list.add_item(args,
+        view.add_item(args,
                       {"url":          li.a["href"],
                        "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.encode("utf-8"),
                        "mode":         "list_season",
@@ -100,7 +100,7 @@ def searchAnime(args):
                       isFolder=True, mediatype="video")
 
 
-    list.endofdirectory()
+    view.endofdirectory()
 
 
 def myDownloads(args):
@@ -113,7 +113,7 @@ def myDownloads(args):
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
     if not container:
-        list.endofdirectory()
+        view.endofdirectory()
         return
 
     for div in container.find_all("div", {"class": "big-item-list_item"}):
@@ -121,7 +121,7 @@ def myDownloads(args):
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
-        list.add_item(args,
+        view.add_item(args,
                       {"url":          div.a["href"].replace("mydownloads/detail", "catalogue/show"),
                        "title":        div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
                        "mode":         "list_season",
@@ -130,7 +130,7 @@ def myDownloads(args):
                       isFolder=True, mediatype="video")
 
 
-    list.endofdirectory()
+    view.endofdirectory()
 
 
 def myCollection(args):
@@ -142,7 +142,7 @@ def myCollection(args):
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
     if not container:
-        list.endofdirectory()
+        view.endofdirectory()
         return
 
     for div in container.find_all("div", {"class": "big-item-list_item"}):
@@ -150,7 +150,7 @@ def myCollection(args):
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
-        list.add_item(args,
+        view.add_item(args,
                       {"url":          div.a["href"].replace("collection/detail", "catalogue/show"),
                        "title":        div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
                        "mode":         "list_season",
@@ -159,7 +159,7 @@ def myCollection(args):
                       isFolder=True, mediatype="video")
 
 
-    list.endofdirectory()
+    view.endofdirectory()
 
 
 def listSeason(args):
@@ -175,7 +175,7 @@ def listSeason(args):
             continue
         title = section.get_text()[6:].strip()
 
-        list.add_item(args,
+        view.add_item(args,
                       {"url":          args.url,
                        "title":        title.encode("utf-8"),
                        "mode":         "list_episodes",
@@ -189,7 +189,7 @@ def listSeason(args):
                       isFolder=True, mediatype="video")
 
 
-    list.endofdirectory()
+    view.endofdirectory()
 
 
 def listEpisodes(args):
@@ -209,7 +209,7 @@ def listEpisodes(args):
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
-        list.add_item(args,
+        view.add_item(args,
                       {"url":          parent.a["href"],
                        "title":        parent.img["alt"].encode("utf-8"),
                        "mode":         "videoplay",
@@ -222,7 +222,7 @@ def listEpisodes(args):
                       isFolder=False, mediatype="video")
 
 
-    list.endofdirectory()
+    view.endofdirectory()
 
 
 def startplayback(args):

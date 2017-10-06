@@ -28,7 +28,7 @@ def parse_args():
 
     else:
         # Args will turn the "None" into None.
-        # Don"t simply define it as None because unquote_plus in updateArgs
+        # Don't simply define it as None because unquote_plus in updateArgs
         # will throw an exception.
         # This is a pretty ugly solution.
         return Args(mode = "None",
@@ -44,10 +44,10 @@ class Args(object):
     """
     def __init__(self, *args, **kwargs):
         """Initialize arguments object.
-        Hold also references to the addon which can"t be kept at module level.
+        Hold also references to the addon which can't be kept at module level.
         """
-        self._addon     = sys.modules["__main__"].__addon__
-        self._addonname = sys.modules["__main__"].__plugin__
+        self._addon     = sys.modules["__main__"]._addon
+        self._addonname = sys.modules["__main__"]._plugin
         self._addonid   = sys.modules["__main__"]._plugId
         self._cj        = None
 
