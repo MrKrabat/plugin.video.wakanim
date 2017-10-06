@@ -45,7 +45,7 @@ def add_item(args, info, isFolder=True, total_items=0, queued=False, rex=re.comp
                           iconImage      = info["thumb"],
                           thumbnailImage = info["thumb"])
     li.setInfo(type       = mediatype,
-               infoLabels = {"mediatype": "tvshow",
+               infoLabels = {"mediatype": "video",
                              "title":     info["title"],
                              "plot":      info["plot"],
                              "year":      info["year"],
