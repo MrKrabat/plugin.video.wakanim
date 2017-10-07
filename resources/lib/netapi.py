@@ -239,34 +239,8 @@ def startplayback(args):
         xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
         return
 
-    # prefer using download able videos
-    if "episode_download_buttons" in html and 1==0: # TODO
-        """
-        div = soup.find("div", {"class": "episode_download_buttons"})
-        if div:
-            for file in reversed(div.find_all("a")):
-                try:
-                    url = "https://www.wakanim.tv" + file["href"] + login.getCookie(args)
-                    item = xbmcgui.ListItem(args.name, path=url)
-                    item.setInfo(type="Video", infoLabels={"Title":       args.name,
-                                                            "TVShowTitle": args.name,
-                                                            "episode":        args.episode,
-                                                            "rating":        args.rating,
-                                                            "plot":            args.plot,
-                                                            "year":            args.year,
-                                                            "studio":        args.studio})
-                    item.setThumbnailImage(args.icon)
-                    xbmc.Player().play(url, item)
-                    return
-                except:
-                    pass
-        else:
-            xbmc.log("[PLUGIN] %s: Failed to play video" % args._addonname, xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
-        """
-
-    # using stream with hls
-    elif ("Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen" in html) or ("Changer de lecteur" in html) or ("Our player is in beta, click here to go back to the old one" in html):
+    # using stream with hls+aes
+    if ("Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen" in html) or ("Changer de lecteur" in html) or ("Our player is in beta, click here to go back to the old one" in html):
         # streaming is only for premium subscription
         if ("<span>Kostenlos</span>" in html) or ("<span>Gratuit</span>" in html) or ("<span>Free</span>" in html):
             xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)

@@ -31,12 +31,8 @@ What this plugin currently can do:
 - [x] Show/browse all seasons/arcs of an anime
 - [x] Show/browse all episodes of an season/arc
 - [x] Display various informations (Kodi displays not all we provide)
+- [x] Watch videos you have bought
 - [x] Watch videos with premium subscription
-
-What is planned for the future:
-- [ ] Watch videos you have bought (deactivated, untested)
-- [ ] Select video resolution (only for videos you bought, streams are adaptive)
-
 ***
 
 _This website and addon is not affiliated with Wakanim._

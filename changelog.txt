@@ -1,3 +1,6 @@
+v0.3.1 (2017.10.07)
+- Cleanup of never implemented feature
+
 v0.3.0 (2017.10.03)
 - Added nordic support
 
