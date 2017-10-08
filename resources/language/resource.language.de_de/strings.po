@@ -70,6 +70,10 @@ msgctxt "#30041"
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
 
+msgctxt "#30042"
+msgid "Reactivation failed of this video"
+msgstr "Reaktivierung fehlgeschlagen dieses Videos"
+
 msgctxt "#30043"
 msgid "You need to be a premium member or own this video"
 msgstr "Du musst premium nutzer sein oder das Video gekauft haben"

@@ -18,6 +18,7 @@
 import re
 import urllib
 import urllib2
+import threading
 from bs4 import BeautifulSoup
 
 import xbmc
@@ -25,6 +26,7 @@ import xbmcgui
 
 import login
 import view
+import server
 
 
 def showCatalog(args):
@@ -239,6 +241,24 @@ def startplayback(args):
         xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
         return
 
+    # check if we have to reactivate video
+    if "reactivate" in html:
+        # reactivate video
+        a = soup.find("div", {"id": "jwplayer-container"}).a["href"]
+        response = urllib2.urlopen("https://www.wakanim.tv" + a)
+        html = response.read()
+
+        # reload page
+        response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
+        html = response.read()
+        soup = BeautifulSoup(html, "html.parser")
+
+        # check if successfull
+        if "reactivate" in html:
+            xbmc.log("[PLUGIN] %s: Reactivation failed '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
+            xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30042))
+            return
+
     # using stream with hls+aes
     if ("Unser Player ist in der Beta-Phase. Klicke hier, um den alten Player zu benutzen" in html) or ("Changer de lecteur" in html) or ("Our player is in beta, click here to go back to the old one" in html):
         # streaming is only for premium subscription
@@ -252,11 +272,18 @@ def startplayback(args):
         matches = re.search(regex, html).group(1)
 
         if matches:
-            # file url
-            url = "https://www.wakanim.tv" + matches
+            # save manifest
+            url  = "https://www.wakanim.tv" + matches
+            m3u8 = urllib2.urlopen(url)
+            m3u8 = m3u8.read()
+
+            # start stream provider
+            t = threading.Thread(target=server.streamprovider, args=(str(m3u8),))
+            t.start()
+            xbmc.sleep(50)
 
             # play stream
-            item = xbmcgui.ListItem(args.name, path=url + login.getCookie(args))
+            item = xbmcgui.ListItem(args.name, path="http://localhost:10147/stream.m3u8" + login.getCookie(args))
             item.setInfo(type="Video", infoLabels={"Title":       args.name,
                                                    "TVShowTitle": args.name,
                                                    "episode":     args.episode,
@@ -268,7 +295,11 @@ def startplayback(args):
                          "banner": args.icon,
                          "fanart": args.fanart,
                          "icon":   args.icon})
-            xbmc.Player().play(url + login.getCookie(args), item)
+            item.setMimeType("application/vnd.apple.mpegurl")
+            xbmc.Player().play("http://localhost:10147/stream.m3u8" + login.getCookie(args), item)
+
+            # wait until stream provider stops
+            t.join()
         else:
             xbmc.log("[PLUGIN] %s: Failed to play stream" % args._addonname, xbmc.LOGERROR)
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
