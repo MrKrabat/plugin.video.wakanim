@@ -41,9 +41,7 @@ def add_item(args, info, isFolder=True, total_items=0, queued=False, rex=re.comp
     u = build_url(info)
 
     # Create list item
-    li = xbmcgui.ListItem(label          = info["title"],
-                          iconImage      = info["thumb"],
-                          thumbnailImage = info["thumb"])
+    li = xbmcgui.ListItem(label = info["title"])
     if isFolder:
         li.setInfo(type       = mediatype,
                    infoLabels = {"title":     info["title"],
