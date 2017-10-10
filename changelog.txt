@@ -1,3 +1,6 @@
+v0.4.0 (2017.10.10)
+- Internal rewrites
+
 v0.3.2 (2017.10.08)
 - Fix playback not possible due security changes
 - Fix playback bought videos
