@@ -52,6 +52,7 @@ def add_item(args, info, isFolder=True, total_items=0, queued=False, rex=re.comp
                                  "rating":    info["rating"],
                                  "genre":     "Anime"})
     else:
+        li.setProperty("IsPlayable", "true")
         li.setInfo(type       = mediatype,
                    infoLabels = {"mediatype": "video",
                                  "title":     info["title"],

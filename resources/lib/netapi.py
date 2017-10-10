@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
+import random
 import urllib
 import urllib2
 import threading
@@ -23,6 +25,7 @@ from bs4 import BeautifulSoup
 
 import xbmc
 import xbmcgui
+import xbmcplugin
 
 import login
 import view
@@ -48,15 +51,15 @@ def showCatalog(args):
 
         view.add_item(args,
                       {"url":          li.a["href"],
-                       "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.encode("utf-8"),
+                       "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
                        "mode":         "list_season",
                        "thumb":        thumb,
                        "fanart_image": thumb,
-                       "episode":      li.find("p", {"class": "tooltip_text"}).strong.string.split(" ")[0],
-                       "season":       li.find("span", {"class": "tooltip_season"}).string.split(" ")[0],
+                       "episode":      li.find("p", {"class": "tooltip_text"}).strong.string.strip().encode("utf-8").split(" ")[0],
+                       "season":       li.find("span", {"class": "tooltip_season"}).string.strip().encode("utf-8").split(" ")[0],
                        "rating":       str(10 - len(star) * 2),
                        "plot":         plot.contents[3].string.strip().encode("utf-8"),
-                       "year":         li.time.string},
+                       "year":         li.time.string.strip().encode("utf-8")},
                       isFolder=True, mediatype="video")
 
 
@@ -90,15 +93,15 @@ def searchAnime(args):
 
         view.add_item(args,
                       {"url":          li.a["href"],
-                       "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.encode("utf-8"),
+                       "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
                        "mode":         "list_season",
                        "thumb":        thumb,
                        "fanart_image": thumb,
-                       "episode":      li.find("p", {"class": "tooltip_text"}).strong.string.split(" ")[0],
-                       "season":       li.find("span", {"class": "tooltip_season"}).string.split(" ")[0],
+                       "episode":      li.find("p", {"class": "tooltip_text"}).strong.string.strip().encode("utf-8").split(" ")[0],
+                       "season":       li.find("span", {"class": "tooltip_season"}).string.strip().encode("utf-8").split(" ")[0],
                        "rating":       str(10 - len(star)*2),
                        "plot":         plot.contents[3].string.strip().encode("utf-8"),
-                       "year":         li.time.string},
+                       "year":         li.time.string.strip().encode("utf-8")},
                       isFolder=True, mediatype="video")
 
 
@@ -171,6 +174,7 @@ def listSeason(args):
     html = response.read()
 
     soup = BeautifulSoup(html, "html.parser")
+    plot = soup.find("div", {"class": "serie_description"}).string.strip().encode("utf-8")
 
     for section in soup.find_all("h2", {"class": "slider-section_title"}):
         if not section.span:
@@ -186,7 +190,7 @@ def listSeason(args):
                        "fanart_image": args.fanart,
                        "episode":      args.episode,
                        "rating":       args.rating,
-                       "plot":         args.plot,
+                       "plot":         plot,
                        "year":         args.year},
                       isFolder=True, mediatype="video")
 
@@ -278,12 +282,13 @@ def startplayback(args):
             m3u8 = m3u8.read()
 
             # start stream provider
-            t = threading.Thread(target=server.streamprovider, args=(str(m3u8),))
+            port = random.randint(10000, 49151)
+            t = threading.Thread(target=server.streamprovider, args=(str(m3u8), port))
             t.start()
             xbmc.sleep(50)
 
             # play stream
-            item = xbmcgui.ListItem(args.name, path="http://localhost:10147/stream.m3u8" + login.getCookie(args))
+            item = xbmcgui.ListItem(args.name, path="http://localhost:" + str(port) + "/stream.m3u8" + login.getCookie(args))
             item.setInfo(type="Video", infoLabels={"Title":       args.name,
                                                    "TVShowTitle": args.name,
                                                    "episode":     args.episode,
@@ -296,7 +301,7 @@ def startplayback(args):
                          "fanart": args.fanart,
                          "icon":   args.icon})
             item.setMimeType("application/vnd.apple.mpegurl")
-            xbmc.Player().play("http://localhost:10147/stream.m3u8" + login.getCookie(args), item)
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
             # wait until stream provider stops
             t.join()

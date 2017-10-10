@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Akibapass - Watch videos from the german anime platform Akibapass.de on Kodi.
-# Copyright (C) 2016 - 2017 MrKrabat
+# Wakanim - Watch videos from the german anime platform Wakanim.tv on Kodi.
+# Copyright (C) 2017 MrKrabat
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,22 +21,21 @@ import socket
 import xbmc
 
 
-header = "HTTP/1.1 200 OK\nContent-Type: application/vnd.apple.mpegurl; charset=utf-8\n\n"
-
-def streamprovider(m3u8):
+def streamprovider(m3u8, port):
     """Server returning manifest to kodi
     """
     try:
         # create listening socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(("127.0.0.1", 10147))
+        sock.bind(("127.0.0.1", port))
         sock.listen(1)
         sock.setblocking(0)
     except socket.error:
         # unable to listen on port
-        xbmc.log("[SERVICE] Akibapass: Failed listening on port 10147", xbmc.LOGFATAL)
+        xbmc.log("[SERVICE] Wakanim: Failed listening on port " + str(port), xbmc.LOGFATAL)
         return
 
+    header  = "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: application/vnd.apple.mpegurl; charset=utf-8\r\nContent-Length: " + str(len(m3u8)) + "\r\n\r\n"
     timer   = time.time() + 10
     counter = 0
     while (time.time() < timer) and (counter < 3):
@@ -50,7 +49,7 @@ def streamprovider(m3u8):
                 data = connection.recv(4096).rstrip()
 
                 # send m3u8
-                connection.sendall(header + m3u8 + "\n")
+                connection.sendall(header + m3u8)
                 counter = counter + 1
             finally:
                 # close connection
