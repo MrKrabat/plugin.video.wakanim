@@ -77,7 +77,8 @@ def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
 
 
 def build_url(args, info):
-    # create url
+    """Create url
+    """
     s = ""
     # step 1 copy new information from info
     for key, value in info.iteritems():

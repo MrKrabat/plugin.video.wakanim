@@ -19,7 +19,7 @@
         <disclaimer lang="en_GB">WARNING: You MUST be a PREMIUM member or BUY videos to use this plugin</disclaimer>
         <disclaimer lang="de_DE">HINWEIS: Du MUSST PREMIUM Mitglied sein oder Videos KAUFEN um dieses Plugin zu benutzen</disclaimer>
         <disclaimer lang="fr_FR">AVERTISSEMENT: VOUS DEVEZ être un membre PREMIUM ou ACHETER des vidéos pour utiliser ce plugin</disclaimer>
-        <news>v0.4.0 (2017.10.10)[CR]- Internal rewrites</news>
+        <news>v0.4.0 (2017.10.10)[CR]- Added screenshots[CR]- Small optimations[CR]- Internal rewrites[CR]- Fixed possible encoding problem[CR]- Removed internal server redirect</news>
         <license>GNU Affero General Public License, v3</license>
         <forum>https://www.kodinerds.net/index.php/Thread/58348-Release-Wakanim-tv/</forum>
         <website>https://www.wakanim.tv/</website>
