@@ -50,18 +50,16 @@ def showCatalog(args):
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":          li.a["href"],
-                       "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
-                       "mode":         "list_season",
-                       "thumb":        thumb,
-                       "fanart_image": thumb,
-                       "episode":      li.find("p", {"class": "tooltip_text"}).strong.string.strip().encode("utf-8").split(" ")[0],
-                       "season":       li.find("span", {"class": "tooltip_season"}).string.strip().encode("utf-8").split(" ")[0],
-                       "rating":       str(10 - len(star) * 2),
-                       "plot":         plot.contents[3].string.strip().encode("utf-8"),
-                       "year":         li.time.string.strip().encode("utf-8")},
+                      {"url":         li.a["href"],
+                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "mode":        "list_season",
+                       "thumb":       thumb,
+                       "fanart":      thumb,
+                       "rating":      str(10 - len(star) * 2),
+                       "plot":        plot.contents[3].string.strip().encode("utf-8"),
+                       "year":        li.time.string.strip().encode("utf-8")},
                       isFolder=True, mediatype="video")
-
 
     view.endofdirectory()
 
@@ -92,18 +90,15 @@ def searchAnime(args):
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":          li.a["href"],
-                       "title":        li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
-                       "mode":         "list_season",
-                       "thumb":        thumb,
-                       "fanart_image": thumb,
-                       "episode":      li.find("p", {"class": "tooltip_text"}).strong.string.strip().encode("utf-8").split(" ")[0],
-                       "season":       li.find("span", {"class": "tooltip_season"}).string.strip().encode("utf-8").split(" ")[0],
-                       "rating":       str(10 - len(star)*2),
-                       "plot":         plot.contents[3].string.strip().encode("utf-8"),
-                       "year":         li.time.string.strip().encode("utf-8")},
+                      {"url":    li.a["href"],
+                       "title":  li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "mode":   "list_season",
+                       "thumb":  thumb,
+                       "fanart": thumb,
+                       "rating": str(10 - len(star) * 2),
+                       "plot":   plot.contents[3].string.strip().encode("utf-8"),
+                       "year":   li.time.string.strip().encode("utf-8")},
                       isFolder=True, mediatype="video")
-
 
     view.endofdirectory()
 
@@ -127,13 +122,12 @@ def myDownloads(args):
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":          div.a["href"].replace("mydownloads/detail", "catalogue/show"),
-                       "title":        div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
-                       "mode":         "list_season",
-                       "thumb":        thumb,
-                       "fanart_image": thumb},
+                      {"url":    div.a["href"].replace("mydownloads/detail", "catalogue/show"),
+                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
+                       "mode":   "list_season",
+                       "thumb":  thumb,
+                       "fanart": thumb},
                       isFolder=True, mediatype="video")
-
 
     view.endofdirectory()
 
@@ -156,13 +150,12 @@ def myCollection(args):
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":          div.a["href"].replace("collection/detail", "catalogue/show"),
-                       "title":        div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
-                       "mode":         "list_season",
-                       "thumb":        thumb,
-                       "fanart_image": thumb},
+                      {"url":    div.a["href"].replace("collection/detail", "catalogue/show"),
+                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
+                       "mode":   "list_season",
+                       "thumb":  thumb,
+                       "fanart": thumb},
                       isFolder=True, mediatype="video")
-
 
     view.endofdirectory()
 
@@ -174,7 +167,12 @@ def listSeason(args):
     html = response.read()
 
     soup = BeautifulSoup(html, "html.parser")
+    
+    date = soup.find_all("span", {"class": "border-list_text"})[0].find_all("span")
+    date = date[0].string.strip().encode("utf-8") + "." + date[1].string.strip().encode("utf-8") + "." + date[2].string.strip().encode("utf-8")
+    originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip().encode("utf-8")
     plot = soup.find("div", {"class": "serie_description"}).string.strip().encode("utf-8")
+    credits = soup.find("div", {"class": "serie_description_more"}).p.string.strip().encode("utf-8")
 
     for section in soup.find_all("h2", {"class": "slider-section_title"}):
         if not section.span:
@@ -182,18 +180,17 @@ def listSeason(args):
         title = section.get_text()[6:].strip()
 
         view.add_item(args,
-                      {"url":          args.url,
-                       "title":        title.encode("utf-8"),
-                       "mode":         "list_episodes",
-                       "season":       title.encode("utf-8"),
-                       "thumb":        args.icon,
-                       "fanart_image": args.fanart,
-                       "episode":      args.episode,
-                       "rating":       args.rating,
-                       "plot":         plot,
-                       "year":         args.year},
+                      {"url":           args.url,
+                       "title":         title.encode("utf-8"),
+                       "mode":          "list_episodes",
+                       "thumb":         args.thumb.replace(" ", "%20"),
+                       "fanart":        args.fanart.replace(" ", "%20"),
+                       "season":        title.encode("utf-8"),
+                       "plot":          plot,
+                       "plotoutline":   getattr(args, "plot", ""),
+                       "originaltitle": originaltitle,
+                       "credits":       credits},
                       isFolder=True, mediatype="video")
-
 
     view.endofdirectory()
 
@@ -206,7 +203,7 @@ def listEpisodes(args):
 
     soup = BeautifulSoup(html, "html.parser")
 
-    for season in soup.findAll(text=args.season):
+    for season in soup.findAll(text=args.title):
         parent = season.find_parent("li")
         if not parent:
             continue
@@ -216,17 +213,12 @@ def listEpisodes(args):
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":          parent.a["href"],
-                       "title":        parent.img["alt"].encode("utf-8"),
-                       "mode":         "videoplay",
-                       "thumb":        thumb,
-                       "fanart_image": args.fanart,
-                       "episode":      args.episode,
-                       "rating":       args.rating,
-                       "plot":         args.plot,
-                       "year":         args.year},
+                      {"url":    parent.a["href"],
+                       "title":  parent.img["alt"].encode("utf-8"),
+                       "mode":   "videoplay",
+                       "thumb":  args.thumb.replace(" ", "%20"),
+                       "fanart": args.fanart.replace(" ", "%20")},
                       isFolder=False, mediatype="video")
-
 
     view.endofdirectory()
 
@@ -288,18 +280,7 @@ def startplayback(args):
             xbmc.sleep(50)
 
             # play stream
-            item = xbmcgui.ListItem(args.name, path="http://localhost:" + str(port) + "/stream.m3u8" + login.getCookie(args))
-            item.setInfo(type="Video", infoLabels={"Title":       args.name,
-                                                   "TVShowTitle": args.name,
-                                                   "episode":     args.episode,
-                                                   "rating":      args.rating,
-                                                   "plot":        args.plot,
-                                                   "year":        args.year})
-            item.setArt({"thumb":  args.icon,
-                         "poster": args.icon,
-                         "banner": args.icon,
-                         "fanart": args.fanart,
-                         "icon":   args.icon})
+            item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path="http://localhost:" + str(port) + "/stream.m3u8" + login.getCookie(args))
             item.setMimeType("application/vnd.apple.mpegurl")
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 

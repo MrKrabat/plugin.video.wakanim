@@ -30,7 +30,7 @@ import view
 def main():
     """Main function for the addon
     """
-    args = cmdargs.parse_args()
+    args = cmdargs.parse()
 
     # check if account is set
     username = args._addon.getSetting("wakanim_username")
@@ -70,20 +70,18 @@ def check_mode(args):
     """
     if hasattr(args, "mode"):
         mode = args.mode
-    else:
+    elif hasattr(args, "id"):
         # call from other plugin
         mode = "videoplay"
-        args.name = "Video"
-        args.episode, args.rating, args.plot, args.year, args.icon, args.fanart = ("None",) * 6
+        args.url = "/" + args._country + "/v2/catalogue/episode/" + args.id
+    elif hasattr(args, "id"):
+        # call from other plugin
+        mode = "videoplay"
+        args.url = args.url[22:]
+    else:
+        mode = None
 
-        if hasattr(args, "id"):
-            args.url = "/" + args._country + "/v2/catalogue/episode/" + args.id
-        elif hasattr(args, "url"):
-            args.url = args.url[22:]
-        else:
-            mode = None
-
-    if mode is None:
+    if not mode:
         showMainMenue(args)
     elif mode == "catalog":
         netapi.showCatalog(args)
