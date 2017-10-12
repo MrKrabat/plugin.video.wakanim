@@ -17,10 +17,8 @@
 
 import re
 import sys
-import random
 import urllib
 import urllib2
-import threading
 from bs4 import BeautifulSoup
 
 import xbmc
@@ -168,7 +166,8 @@ def listSeason(args):
     soup = BeautifulSoup(html, "html.parser")
 
     date = soup.find_all("span", {"class": "border-list_text"})[0].find_all("span")
-    date = date[0].string.strip().encode("utf-8") + "." + date[1].string.strip().encode("utf-8") + "." + date[2].string.strip().encode("utf-8")
+    year = date[2].string.strip().encode("utf-8")
+    date = year + "-" + date[1].string.strip().encode("utf-8") + "-" + date[0].string.strip().encode("utf-8")
     originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip().encode("utf-8")
     plot = soup.find("div", {"class": "serie_description"}).string.strip().encode("utf-8")
     credits = soup.find("div", {"class": "serie_description_more"}).p.string.strip().encode("utf-8")
@@ -187,6 +186,8 @@ def listSeason(args):
                        "season":        title.encode("utf-8"),
                        "plot":          plot,
                        "plotoutline":   getattr(args, "plot", ""),
+                       "year":          year,
+                       "premiered":     date,
                        "originaltitle": originaltitle,
                        "credits":       credits},
                       isFolder=True, mediatype="video")
