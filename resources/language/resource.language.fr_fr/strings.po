@@ -59,6 +59,10 @@ msgctxt "#30023"
 msgid "My collection"
 msgstr "Ma collection"
 
+msgctxt "#30024"
+msgid "Watch trailer"
+msgstr "Regarde la bande-annonce"
+
 
 # Wakanim Messages
 

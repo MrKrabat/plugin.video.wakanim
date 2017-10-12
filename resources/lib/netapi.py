@@ -171,6 +171,19 @@ def listSeason(args):
     originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip().encode("utf-8")
     plot = soup.find("div", {"class": "serie_description"}).string.strip().encode("utf-8")
     credits = soup.find("div", {"class": "serie_description_more"}).p.string.strip().encode("utf-8")
+    trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
+    try:
+        trailer = trailer.iframe["src"]
+        trailer = "plugin://plugin.video.youtube/play/?video_id=" + re.search(r"/embed/?([^&=%\?]{11})", trailer).group(1)
+        view.add_item(args,
+                      {"url":    trailer,
+                       "mode":   "trailer",
+                       "thumb":  args.thumb.replace(" ", "%20"),
+                       "fanart": args.fanart.replace(" ", "%20"),
+                       "title":  args._addon.getLocalizedString(30024)},
+                      isFolder=False, mediatype="video")
+    except AttributeError:
+        trailer = ""
 
     for section in soup.find_all("h2", {"class": "slider-section_title"}):
         if not section.span:
@@ -188,6 +201,7 @@ def listSeason(args):
                        "plotoutline":   getattr(args, "plot", ""),
                        "year":          year,
                        "premiered":     date,
+                       "trailer":       trailer,
                        "originaltitle": originaltitle,
                        "credits":       credits},
                       isFolder=True, mediatype="video")

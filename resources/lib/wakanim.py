@@ -97,6 +97,9 @@ def check_mode(args):
         netapi.listEpisodes(args)
     elif mode == "videoplay":
         netapi.startplayback(args)
+    elif mode == "trailer":
+        item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=args.url)
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
     else:
         # unkown mode
         xbmc.log("[PLUGIN] %s: Failed in check_mode '%s'" % (args._addonname, str(mode)), xbmc.LOGERROR)
