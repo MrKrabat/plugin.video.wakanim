@@ -174,7 +174,7 @@ def listSeason(args):
     trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
     try:
         trailer = trailer.iframe["src"]
-        trailer = "plugin://plugin.video.youtube/play/?video_id=" + re.search(r"/embed/?([^&=%\?]{11})", trailer).group(1)
+        trailer = "plugin://plugin.video.youtube/play/?video_id=" + re.search(r"(?:\.be/|/embed)/?([^&=%:/\?]{11})", trailer).group(1)
         view.add_item(args,
                       {"url":    trailer,
                        "mode":   "trailer",
