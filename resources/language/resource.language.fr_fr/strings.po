@@ -29,12 +29,12 @@ msgid "Region"
 msgstr "Région"
 
 msgctxt "#30011"
-msgid "Germany"
-msgstr "Allemagne"
+msgid "Germany, Austria, Switzerland"
+msgstr "Allemagne, Autriche, Suisse"
 
 msgctxt "#30012"
-msgid "France, Belgium, Switzerland, Quebec"
-msgstr "France, Belgique, Suisse, Quebec"
+msgid "France, Switzerland, Monaco, Benelux Union, Franco-Canadians, Overseas France, Africa"
+msgstr "France, Suisse, Monaco, Union Benelux, Canadiens francophones, France d'outre-mer, Afrique"
 
 msgctxt "#30013"
 msgid "Sweden, Norway, Iceland, Finland, Denmark"
