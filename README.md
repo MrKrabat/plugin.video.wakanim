@@ -34,6 +34,7 @@ What this plugin currently can do:
 - [x] Reactivate videos/streams
 - [x] Watch videos you have bought
 - [x] Watch videos with premium subscription
+- [x] Watch anime trailer (requires YouTube plugin)
 ***
 
 _This website and addon is not affiliated with Wakanim._
