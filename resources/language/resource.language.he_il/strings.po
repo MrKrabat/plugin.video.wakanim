@@ -28,11 +28,11 @@ msgid "Region"
 msgstr "אזור"
 
 msgctxt "#30011"
-msgid "Germany"
+msgid "Germany, Austria, Switzerland"
 msgstr "גרמניה"
 
 msgctxt "#30012"
-msgid "France, Belgium, Switzerland, Quebec"
+msgid "France, Switzerland, Monaco, Benelux Union, Franco-Canadians, Overseas France, Africa"
 msgstr "צרפת, בלגיה, שוויץ, קוויבק"
 
 msgctxt "#30013"
