@@ -1,3 +1,6 @@
+v0.6.1 (2018.01.21)
+- Fix episode thumbnails
+
 v0.6.0 (2018.01.14)
 - Added Wakanim Russia (thanks AkariDN)
 
