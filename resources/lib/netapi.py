@@ -230,7 +230,7 @@ def listEpisodes(args):
                       {"url":    parent.a["href"],
                        "title":  parent.img["alt"].encode("utf-8"),
                        "mode":   "videoplay",
-                       "thumb":  args.thumb.replace(" ", "%20"),
+                       "thumb":  thumb.replace(" ", "%20"),
                        "fanart": args.fanart.replace(" ", "%20")},
                       isFolder=False, mediatype="video")
 
