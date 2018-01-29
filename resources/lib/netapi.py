@@ -61,6 +61,35 @@ def showCatalog(args):
     view.endofdirectory()
 
 
+def listLastEpisodes(args):
+    """Show last aired episodes
+    """
+    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
+    html = response.read()
+
+    soup = BeautifulSoup(html, "html.parser")
+    container = soup.find("div", {"class": "js-slider-lastEp"})
+    if not container:
+        view.endofdirectory()
+        return
+
+    for li in container.find_all("li"):
+        thumb = li.img["src"].replace(" ", "%20")
+        if thumb[:4] != "http":
+            thumb = "https:" + thumb
+
+        view.add_item(args,
+                      {"url":    li.a["href"],
+                       "title":  li.img["alt"].encode("utf-8"),
+                       "mode":   "videoplay",
+                       "thumb":  thumb,
+                       "fanart": thumb,
+                       "plot":   li.find("a", {"class": "slider_item_season"}).string.strip().encode("utf-8")},
+                      isFolder=False, mediatype="video")
+
+    view.endofdirectory()
+
+
 def searchAnime(args):
     """Search for animes
     """
