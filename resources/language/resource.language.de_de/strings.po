@@ -66,6 +66,9 @@ msgctxt "#30024"
 msgid "Watch trailer"
 msgstr "Trailer ansehen"
 
+msgctxt "#30025"
+msgid "Last aired episodes"
+msgstr "Letzte ausgestrahlte Folgen"
 
 # Wakanim Messages
 
