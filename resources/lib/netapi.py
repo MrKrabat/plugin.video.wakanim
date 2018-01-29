@@ -17,6 +17,7 @@
 
 import re
 import sys
+import json
 import urllib
 import urllib2
 from bs4 import BeautifulSoup
@@ -74,17 +75,20 @@ def listLastEpisodes(args):
         return
 
     for li in container.find_all("li"):
+        progress = int(li.find("div", {"class": "ProgressBar"}).get("data-progress"))
         thumb = li.img["src"].replace(" ", "%20")
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":    li.a["href"],
-                       "title":  li.img["alt"].encode("utf-8"),
-                       "mode":   "videoplay",
-                       "thumb":  thumb,
-                       "fanart": thumb,
-                       "plot":   li.find("a", {"class": "slider_item_season"}).string.strip().encode("utf-8")},
+                      {"url":       li.a["href"],
+                       "title":     li.img["alt"].encode("utf-8"),
+                       "mode":      "videoplay",
+                       "thumb":     thumb,
+                       "fanart":    thumb,
+                       "plot":      li.find("a", {"class": "slider_item_season"}).string.strip().encode("utf-8"),
+                       "playcount": "1" if progress > 90 else "0",
+                       "progress":  str(progress)},
                       isFolder=False, mediatype="video")
 
     view.endofdirectory()
@@ -177,16 +181,19 @@ def myWatchlist(args):
         return
 
     for div in section.find_all("div", {"class": "slider_item"}):
+        progress = int(div.find("div", {"class": "ProgressBar"}).get("data-progress"))
         thumb = div.img["src"].replace(" ", "%20")
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
         view.add_item(args,
-                      {"url":    div.find("div", {"class": "slider_item_inner"}).a["href"],
-                       "title":  div.img["alt"].encode("utf-8"),
-                       "mode":   "videoplay",
-                       "thumb":  thumb.replace(" ", "%20"),
-                       "fanart": thumb.replace(" ", "%20")},
+                      {"url":       div.find("div", {"class": "slider_item_inner"}).a["href"],
+                       "title":     div.img["alt"].encode("utf-8"),
+                       "mode":      "videoplay",
+                       "thumb":     thumb.replace(" ", "%20"),
+                       "fanart":    thumb.replace(" ", "%20"),
+                       "playcount": "1" if progress > 90 else "0",
+                       "progress":  str(progress)},
                       isFolder=False, mediatype="video")
 
     view.endofdirectory()
@@ -315,16 +322,19 @@ def listEpisodes(args):
         if season != args.title:
             continue
         for li in section.find_all("li", {"class": "slider_item"}):
+            progress = int(li.find("div", {"class": "ProgressBar"}).get("data-progress"))
             thumb = li.img["src"].replace(" ", "%20")
             if thumb[:4] != "http":
                 thumb = "https:" + thumb
 
             view.add_item(args,
-                          {"url":    li.a["href"],
-                           "title":  li.img["alt"].encode("utf-8"),
-                           "mode":   "videoplay",
-                           "thumb":  thumb.replace(" ", "%20"),
-                           "fanart": args.fanart.replace(" ", "%20")},
+                          {"url":       li.a["href"],
+                           "title":     li.img["alt"].encode("utf-8"),
+                           "mode":      "videoplay",
+                           "thumb":     thumb.replace(" ", "%20"),
+                           "fanart":    args.fanart.replace(" ", "%20"),
+                           "playcount": "1" if progress > 90 else "0",
+                           "progress":  str(progress)},
                           isFolder=False, mediatype="video")
         break
 
@@ -384,6 +394,46 @@ def startplayback(args):
             item.setMimeType("application/vnd.apple.mpegurl")
             item.setContentLookup(False)
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
+
+            # get handles
+            playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+            player = xbmc.Player()
+
+            # get episode id
+            regex = r"idepisode=(.*?)&(?:.*?)&idserie=(.*?)\","
+            matches = re.search(regex, html)
+            episodeid = int(matches.group(1))
+            showid = int(matches.group(2))
+
+            # wait for video to begin
+            xbmc.sleep(3000)
+            playlist_position = playlist.getposition()
+
+            # update playtime at wakanim
+            try:
+                while playlist_position == playlist.getposition():
+                    # sleep
+                    xbmc.sleep(10000)
+
+                    # calculate time
+                    timeplayed = int(player.getTime())
+                    post = {"ShowId": showid,
+                            "EpisodeId": episodeid,
+                            "PlayTime": timeplayed,
+                            "Duration": int(player.getTotalTime()),
+                            "TotalPlayedTime": 4,
+                            "FromSVOD": "true"}
+                    #xbmc.log("WAKANIM: " + json.dumps(post), xbmc.LOGDEBUG)
+
+                    # post data
+                    req = urllib2.Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
+                                          json.dumps(post),
+                                          headers={"Content-type": "application/json"})
+                    response = urllib2.urlopen(req)
+                    html = response.read()
+                    #xbmc.log("WAKANIM: " + html, xbmc.LOGDEBUG)
+            except RuntimeError:
+                xbmc.log("[PLUGIN] %s: Playback failed" % args._addonname, xbmc.LOGERROR)
         else:
             xbmc.log("[PLUGIN] %s: Failed to play stream" % args._addonname, xbmc.LOGERROR)
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
