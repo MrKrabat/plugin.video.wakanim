@@ -218,22 +218,23 @@ def listEpisodes(args):
 
     soup = BeautifulSoup(html, "html.parser")
 
-    for season in soup.findAll(text=args.title):
-        parent = season.find_parent("li")
-        if not parent:
+    for section in soup.find_all("section", {"class": "seasonSection"}):
+        season = section.find("h2", {"class": "slider-section_title"}).get_text().split("%", 1)[1].strip().encode("utf-8")
+        if season != args.title:
             continue
+        for li in section.find_all("li", {"class": "slider_item"}):
+            thumb = li.img["src"].replace(" ", "%20")
+            if thumb[:4] != "http":
+                thumb = "https:" + thumb
 
-        thumb = parent.img["src"].replace(" ", "%20")
-        if thumb[:4] != "http":
-            thumb = "https:" + thumb
-
-        view.add_item(args,
-                      {"url":    parent.a["href"],
-                       "title":  parent.img["alt"].encode("utf-8"),
-                       "mode":   "videoplay",
-                       "thumb":  thumb.replace(" ", "%20"),
-                       "fanart": args.fanart.replace(" ", "%20")},
-                      isFolder=False, mediatype="video")
+            view.add_item(args,
+                          {"url":    li.a["href"],
+                           "title":  li.img["alt"].encode("utf-8"),
+                           "mode":   "videoplay",
+                           "thumb":  thumb.replace(" ", "%20"),
+                           "fanart": args.fanart.replace(" ", "%20")},
+                          isFolder=False, mediatype="video")
+        break
 
     view.endofdirectory()
 
