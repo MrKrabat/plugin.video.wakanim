@@ -89,8 +89,12 @@ def check_mode(args):
         netapi.showCatalog(args)
     elif mode == "last_episodes":
         netapi.listLastEpisodes(args)
+    elif mode == "last_simulcasts":
+        netapi.listLastSimulcasts(args)
     elif mode == "search":
         netapi.searchAnime(args)
+    elif mode == "watchlist":
+        netapi.myWatchlist(args)
     elif mode == "downloads":
         netapi.myDownloads(args)
     elif mode == "collection":
@@ -121,8 +125,14 @@ def showMainMenue(args):
                   {"title": args._addon.getLocalizedString(30025),
                    "mode":   "last_episodes"})
     view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30026),
+                   "mode":   "last_simulcasts"})
+    view.add_item(args,
                   {"title": args._addon.getLocalizedString(30021),
                    "mode":   "search"})
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30027),
+                   "mode":   "watchlist"})
     view.add_item(args,
                   {"title": args._addon.getLocalizedString(30022),
                    "mode":   "downloads"})

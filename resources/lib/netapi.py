@@ -90,6 +90,41 @@ def listLastEpisodes(args):
     view.endofdirectory()
 
 
+def listLastSimulcasts(args):
+    """Show last simulcasts
+    """
+    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
+    html = response.read()
+
+    soup = BeautifulSoup(html, "html.parser")
+    container = soup.find("div", {"class": "js-slider-lastShow"})
+    if not container:
+        view.endofdirectory()
+        return
+
+    for li in container.find_all("li"):
+        plot  = li.find("p", {"class": "tooltip_text"})
+        stars = li.find("div", {"class": "stars"})
+        star  = stars.find_all("span", {"class": "-no"})
+        thumb = li.img["src"].replace(" ", "%20")
+        if thumb[:4] != "http":
+            thumb = "https:" + thumb
+
+        view.add_item(args,
+                      {"url":         li.a["href"],
+                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "mode":        "list_season",
+                       "thumb":       thumb,
+                       "fanart":      thumb,
+                       "rating":      str(10 - len(star) * 2),
+                       "plot":        plot.contents[3].string.strip().encode("utf-8"),
+                       "year":        li.time.string.strip().encode("utf-8")},
+                      isFolder=True, mediatype="video")
+
+    view.endofdirectory()
+
+
 def searchAnime(args):
     """Search for animes
     """
@@ -125,6 +160,34 @@ def searchAnime(args):
                        "plot":   plot.contents[3].string.strip().encode("utf-8"),
                        "year":   li.time.string.strip().encode("utf-8")},
                       isFolder=True, mediatype="video")
+
+    view.endofdirectory()
+
+
+def myWatchlist(args):
+    """Show all episodes on watchlist
+    """
+    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/watchlist")
+    html = response.read()
+
+    soup = BeautifulSoup(html, "html.parser")
+    section = soup.find("section")
+    if not section:
+        view.endofdirectory()
+        return
+
+    for div in section.find_all("div", {"class": "slider_item"}):
+        thumb = div.img["src"].replace(" ", "%20")
+        if thumb[:4] != "http":
+            thumb = "https:" + thumb
+
+        view.add_item(args,
+                      {"url":    div.find("div", {"class": "slider_item_inner"}).a["href"],
+                       "title":  div.img["alt"].encode("utf-8"),
+                       "mode":   "videoplay",
+                       "thumb":  thumb.replace(" ", "%20"),
+                       "fanart": thumb.replace(" ", "%20")},
+                      isFolder=False, mediatype="video")
 
     view.endofdirectory()
 
