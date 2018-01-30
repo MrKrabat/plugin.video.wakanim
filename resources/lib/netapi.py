@@ -18,6 +18,7 @@
 import re
 import ssl
 import sys
+import time
 import json
 import urllib
 import urllib2
@@ -404,11 +405,13 @@ def startplayback(args):
             showid = int(matches.group(2))
 
             # wait for video to begin
-            while not player.isPlaying():
-                xbmc.sleep(20)
-            # wait for stream to load
-            while not player.getTotalTime():
-                xbmc.sleep(20)
+            timeout = time.time() + 20
+            while not xbmc.getCondVisibility("Player.IsInternetStream"):
+                xbmc.sleep(50)
+                # timeout to prevent infinite loop
+                if time.time() > timeout:
+                    xbmc.log("[PLUGIN] %s: Timeout reached, video did not start in 20 seconds" % args._addonname, xbmc.LOGERROR)
+                    return
 
             # ask if user want to continue playback
             resume = int(args.progress)
@@ -421,7 +424,7 @@ def startplayback(args):
             # update playtime at wakanim
             try:
                 while url == player.getPlayingFile():
-                    # sleep
+                    # wait 10 seconds
                     xbmc.sleep(10000)
 
                     # calculate message
