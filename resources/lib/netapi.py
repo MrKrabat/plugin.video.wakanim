@@ -446,7 +446,7 @@ def startplayback(args):
                         # catch timeout exception
                         pass
             except RuntimeError:
-                xbmc.log("[PLUGIN] %s: Playback aborted" % args._addonname, xbmc.LOGERROR)
+                xbmc.log("[PLUGIN] %s: Playback aborted" % args._addonname, xbmc.LOGDEBUG)
         else:
             xbmc.log("[PLUGIN] %s: Failed to play stream" % args._addonname, xbmc.LOGERROR)
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
