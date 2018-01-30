@@ -99,3 +99,7 @@ msgstr "Vous devez être un membre premium ou posséder cette vidéo"
 msgctxt "#30044"
 msgid "Failed to play video"
 msgstr "Impossible de lire de la vidéo"
+
+msgctxt "#30045"
+msgid "Do you want to continue watching at %s%%?"
+msgstr "Voulez-vous continuer à regarder à %s%%?"

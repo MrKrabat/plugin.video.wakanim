@@ -99,3 +99,7 @@ msgstr "Вы должны оформить подписку или купить 
 msgctxt "#30044"
 msgid "Failed to play video"
 msgstr "Не удалось воспроизвести видео"
+
+msgctxt "#30045"
+msgid "Do you want to continue watching at %s%%?"
+msgstr "Вы хотите продолжить просмотр на %s%%?"

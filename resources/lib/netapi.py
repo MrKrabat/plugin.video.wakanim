@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import ssl
 import sys
 import json
 import urllib
@@ -387,53 +388,62 @@ def startplayback(args):
 
         if matches:
             # manifest url
-            url = "https://www.wakanim.tv" + matches
+            url = "https://www.wakanim.tv" + matches + login.getCookie(args)
 
             # play stream
-            item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url + login.getCookie(args))
+            item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
             item.setMimeType("application/vnd.apple.mpegurl")
             item.setContentLookup(False)
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
-            # get handles
-            playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+            # get required infos
             player = xbmc.Player()
-
-            # get episode id
             regex = r"idepisode=(.*?)&(?:.*?)&idserie=(.*?)\","
             matches = re.search(regex, html)
             episodeid = int(matches.group(1))
             showid = int(matches.group(2))
 
             # wait for video to begin
-            xbmc.sleep(3000)
-            playlist_position = playlist.getposition()
+            while not player.isPlaying():
+                xbmc.sleep(20)
+            # wait for stream to load
+            while not player.getTotalTime():
+                xbmc.sleep(20)
+
+            # ask if user want to continue playback
+            resume = int(args.progress)
+            if resume >= 5 and resume <= 90:
+                player.pause()
+                if xbmcgui.Dialog().yesno(args._addonname, args._addon.getLocalizedString(30045) % resume):
+                    player.seekTime(player.getTotalTime() * (resume/100.0))
+                player.pause()
 
             # update playtime at wakanim
             try:
-                while playlist_position == playlist.getposition():
+                while url == player.getPlayingFile():
                     # sleep
                     xbmc.sleep(10000)
 
-                    # calculate time
-                    timeplayed = int(player.getTime())
-                    post = {"ShowId": showid,
-                            "EpisodeId": episodeid,
-                            "PlayTime": timeplayed,
-                            "Duration": int(player.getTotalTime()),
+                    # calculate message
+                    post = {"ShowId":          showid,
+                            "EpisodeId":       episodeid,
+                            "PlayTime":        player.getTime(),
+                            "Duration":        player.getTotalTime(),
                             "TotalPlayedTime": 4,
-                            "FromSVOD": "true"}
-                    #xbmc.log("WAKANIM: " + json.dumps(post), xbmc.LOGDEBUG)
+                            "FromSVOD":        "true"}
 
-                    # post data
-                    req = urllib2.Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
-                                          json.dumps(post),
-                                          headers={"Content-type": "application/json"})
-                    response = urllib2.urlopen(req)
-                    html = response.read()
-                    #xbmc.log("WAKANIM: " + html, xbmc.LOGDEBUG)
+                    # send data
+                    try:
+                        req = urllib2.Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
+                                              json.dumps(post),
+                                              headers={"Content-type": "application/json"})
+                        response = urllib2.urlopen(req)
+                        html = response.read()
+                    except ssl.SSLError:
+                        # catch timeout exception
+                        pass
             except RuntimeError:
-                xbmc.log("[PLUGIN] %s: Playback failed" % args._addonname, xbmc.LOGERROR)
+                xbmc.log("[PLUGIN] %s: Playback aborted" % args._addonname, xbmc.LOGERROR)
         else:
             xbmc.log("[PLUGIN] %s: Failed to play stream" % args._addonname, xbmc.LOGERROR)
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
