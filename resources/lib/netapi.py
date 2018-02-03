@@ -22,6 +22,7 @@ import time
 import json
 import urllib
 import urllib2
+import inputstreamhelper
 from bs4 import BeautifulSoup
 
 import xbmc
@@ -399,20 +400,26 @@ def startplayback(args):
                 item.setContentLookup(False)
             else:
                 # mpd dash
-                url = urllib.unquote(re.search(r"manifest=(.*?)\&", html).group(1))
-                item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
-                item.setMimeType("application/dash+xml")
-                item.setContentLookup(False)
-                # get headers
-                item.setProperty("inputstream.adaptive.stream_headers", login.getCookie(args)[1:])
-                item.setProperty("inputstream.adaptive.license_type", "com.widevine.alpha")
-                item.setProperty("inputstream.adaptive.manifest_type", "mpd")
-                # get key url
-                item.setProperty("inputstream.adaptive.license_key", re.search(r"url: \"(.*?)\",", html).group(1)
-                                 + "|" + urllib.urlencode({"Authorization": re.search(r"value: \"(.*?)\"", html).group(1)})
-                                 + "&User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|")
-                item.setProperty("inputstreamaddon", "inputstream.adaptive")
-                item.setProperty("IsPlayable", "true")
+                is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha")
+                if is_helper.check_inputstream():
+                    url = urllib.unquote(re.search(r"manifest=(.*?)\&", html).group(1))
+                    item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
+                    item.setMimeType("application/dash+xml")
+                    item.setContentLookup(False)
+                    # get headers
+                    item.setProperty("inputstream.adaptive.stream_headers", login.getCookie(args)[1:])
+                    item.setProperty("inputstream.adaptive.license_type", "com.widevine.alpha")
+                    item.setProperty("inputstream.adaptive.manifest_type", "mpd")
+                    # get key url
+                    item.setProperty("inputstream.adaptive.license_key", re.search(r"url: \"(.*?)\",", html).group(1)
+                                     + "|" + urllib.urlencode({"Authorization": re.search(r"value: \"(.*?)\"", html).group(1)})
+                                     + "&User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|")
+                    item.setProperty("inputstreamaddon", "inputstream.adaptive")
+                    item.setProperty("IsPlayable", "true")
+                else:
+                    xbmc.log("[PLUGIN] %s: Inputstreamhelper failed to install Widevine" % args._addonname, xbmc.LOGERROR)
+                    xbmcplugin.setResolvedUrl(int(sys.argv[1]), False)
+                    return False
 
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 

@@ -19,6 +19,7 @@ import sys
 
 import xbmc
 import xbmcgui
+import xbmcaddon
 import xbmcplugin
 
 import cmdargs
@@ -31,6 +32,11 @@ def main():
     """Main function for the addon
     """
     args = cmdargs.parse()
+
+    # inputstream adaptive settings
+    if hasattr(args, "mode") and args.mode == "mpd":
+        xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
+        return True
 
     # check if account is set
     username = args._addon.getSetting("wakanim_username")
