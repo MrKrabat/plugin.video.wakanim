@@ -1,3 +1,6 @@
+v0.7.1 (2018.02.03)
+- Added Widevine DRM support
+
 v0.7.0 (2018.01.30)
 - Added watchlist
 - Added last aired episodes list (thanks AkariDN)
