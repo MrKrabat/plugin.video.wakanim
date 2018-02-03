@@ -16,9 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import inputstreamhelper
 
 import xbmc
 import xbmcgui
+import xbmcaddon
 import xbmcplugin
 
 import cmdargs
@@ -31,6 +33,13 @@ def main():
     """Main function for the addon
     """
     args = cmdargs.parse()
+
+    # inputstream adaptive settings
+    if hasattr(args, "mode") and args.mode == "mpd":
+        is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha")
+        if is_helper.check_inputstream():
+            xbmcaddon.Addon(id="inputstream.adaptive").openSettings()
+        return True
 
     # check if account is set
     username = args._addon.getSetting("wakanim_username")
