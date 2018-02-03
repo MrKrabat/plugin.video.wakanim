@@ -392,13 +392,15 @@ def startplayback(args):
             url = "https://www.wakanim.tv" + matches + login.getCookie(args)
 
             # play stream
-            item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
             if "type: 'hls'," in html:
                 # hls+aes
+                item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
                 item.setMimeType("application/vnd.apple.mpegurl")
                 item.setContentLookup(False)
             else:
                 # mpd dash
+                url = urllib.unquote(re.search(r"manifest=(.*?)\&", html).group(1))
+                item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
                 item.setMimeType("application/dash+xml")
                 item.setContentLookup(False)
                 # get headers
