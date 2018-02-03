@@ -418,7 +418,8 @@ def startplayback(args):
                     item.setProperty("IsPlayable", "true")
                 else:
                     xbmc.log("[PLUGIN] %s: Inputstreamhelper failed to install Widevine" % args._addonname, xbmc.LOGERROR)
-                    xbmcplugin.setResolvedUrl(int(sys.argv[1]), False)
+                    item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"))
+                    xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, item)
                     return False
 
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
