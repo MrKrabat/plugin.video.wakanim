@@ -36,8 +36,10 @@ import view
 def showCatalog(args):
     """Show all animes
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue")
+    if not html:
+        view.endofdirectory()
+        return
 
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
@@ -68,8 +70,7 @@ def showCatalog(args):
 def listLastEpisodes(args):
     """Show last aired episodes
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "js-slider-lastEp"})
@@ -100,8 +101,7 @@ def listLastEpisodes(args):
 def listLastSimulcasts(args):
     """Show last simulcasts
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "js-slider-lastShow"})
@@ -140,8 +140,7 @@ def searchAnime(args):
         return
 
     post_data = urllib.urlencode({"search": d})
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data)
 
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
@@ -174,8 +173,7 @@ def searchAnime(args):
 def myWatchlist(args):
     """Show all episodes on watchlist
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/watchlist")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/watchlist")
 
     soup = BeautifulSoup(html, "html.parser")
     section = soup.find("section")
@@ -206,8 +204,7 @@ def myDownloads(args):
     """View download able animes
     May not every episode is download able.
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/mydownloads")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/mydownloads")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
@@ -234,8 +231,7 @@ def myDownloads(args):
 def myCollection(args):
     """View collection
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/collection")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/collection")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
@@ -262,8 +258,10 @@ def myCollection(args):
 def listSeason(args):
     """Show all seasons/arcs of an anime
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
+    if not html:
+        view.endofdirectory()
+        return
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -315,8 +313,7 @@ def listSeason(args):
 def listEpisodes(args):
     """Show all episodes of an season/arc
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -347,8 +344,9 @@ def listEpisodes(args):
 def startplayback(args):
     """Plays a video
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
+    if not html:
+        return
 
     # check if not premium
     if ("Diese Folge ist für Abonnenten reserviert" in html) or ("Cet épisode est reservé à nos abonnés" in html) or ("This episode is reserved for our subscribers" in html) or ("Эта серия зарезервирована для наших подписчиков" in html):
