@@ -16,7 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-import urllib
+try:
+    from urllib import quote_plus
+except ImportError:
+    from urllib.parse import quote_plus
 
 import xbmc
 import xbmcgui
@@ -78,7 +81,7 @@ def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
 
 
 def quote_value(value):
-    return urllib.quote_plus(value.encode("utf8") if isinstance(value, unicode) else value)
+    return quote_plus(value.encode("utf8") if not isinstance(value, str) else value)
 
 
 def build_url(args, info):
@@ -86,12 +89,12 @@ def build_url(args, info):
     """
     s = ""
     # step 1 copy new information from info
-    for key, value in info.iteritems():
+    for key, value in list(info.items()):
         if value:
             s = s + "&" + key + "=" + quote_value(value)
 
     # step 2 copy old information from args, but don't append twice
-    for key, value in args.__dict__.iteritems():
+    for key, value in list(args.__dict__.items()):
         if value and key in types and not "&" + str(key) + "=" in s:
             s = s + "&" + key + "=" + quote_value(value)
 
@@ -103,12 +106,12 @@ def make_infolabel(args, info):
     """
     infoLabels = {}
     # step 1 copy new information from info
-    for key, value in info.iteritems():
+    for key, value in list(info.items()):
         if value and key in types:
             infoLabels[key] = value
 
     # step 2 copy old information from args, but don't overwrite
-    for key, value in args.__dict__.iteritems():
+    for key, value in list(args.__dict__.items()):
         if value and key in types and key not in infoLabels:
             infoLabels[key] = value
 

@@ -16,9 +16,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import cookielib
-import urllib
-import urllib2
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+try:
+    from urllib2 import urlopen, build_opener, HTTPCookieProcessor, install_opener
+except ImportError:
+    from urllib.request import urlopen, build_opener, HTTPCookieProcessor, install_opener
+try:
+    from cookielib import LWPCookieJar
+except ImportError:
+    from http.cookiejar import LWPCookieJar
 
 import xbmc
 
@@ -30,26 +39,26 @@ def login(username, password, args):
 
     # create cookie path
     cookiepath = os.path.join(
-        xbmc.translatePath(args._addon.getAddonInfo("profile")).decode("utf-8"),
+        xbmc.translatePath(args._addon.getAddonInfo("profile")),
         "cookies.lwp")
 
     # create cookiejar
-    cj = cookielib.LWPCookieJar()
+    cj = LWPCookieJar()
     args._cj = cj
 
     # lets urllib2 handle cookies
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener = build_opener(HTTPCookieProcessor(cj))
     opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36")]
     opener.addheaders = [("Accept-Charset", "utf-8")]
-    urllib2.install_opener(opener)
+    install_opener(opener)
 
     # check if session exists
     try:
         cj.load(cookiepath, ignore_discard=True)
 
         # check if session is valid
-        response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
-        html = response.read()
+        response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
+        html = response.read().decode("utf-8")
 
         if ("Meine Benachrichtigungen verwalten" in html) or ("Gérer mes notifications" in html) or ("Manage my notifications" in html) or ("Настройки уведомлений" in html):
             # session is valid
@@ -60,15 +69,15 @@ def login(username, password, args):
         pass
 
     # build POST data
-    post_data = urllib.urlencode({"username": username,
-                                  "password": password,
-                                  "remember": "1"})
+    post_data = urlencode({"username": username,
+                           "password": password,
+                           "remember": "1"})
 
     # POST to login page
-    response = urllib2.urlopen(login_url, post_data)
+    response = urlopen(login_url, post_data.encode("utf-8"))
 
     # check for login string
-    html = response.read()
+    html = response.read().decode("utf-8")
 
     if ("Meine Benachrichtigungen verwalten" in html) or ("Gérer mes notifications" in html) or ("Manage my notifications" in html) or ("Настройки уведомлений" in html):
         # save session to disk
@@ -83,13 +92,13 @@ def getCookie(args):
     """
     # create cookie path
     cookiepath = os.path.join(
-        xbmc.translatePath(args._addon.getAddonInfo("profile")).decode("utf-8"),
+        xbmc.translatePath(args._addon.getAddonInfo("profile")),
         "cookies.lwp")
     # save session to disk
     args._cj.save(cookiepath, ignore_discard=True)
 
     ret = ""
     for cookie in args._cj:
-        ret += urllib.urlencode({cookie.name: cookie.value}) + ";"
+        ret += urlencode({cookie.name: cookie.value}) + ";"
 
     return "|User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Cookie=" + ret[:-1]

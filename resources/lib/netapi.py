@@ -20,24 +20,30 @@ import ssl
 import sys
 import time
 import json
-import urllib
-import urllib2
 import inputstreamhelper
 from bs4 import BeautifulSoup
+try:
+    from urllib import urlencode, unquote
+except ImportError:
+    from urllib.parse import urlencode, unquote
+try:
+    from urllib2 import urlopen, Request
+except ImportError:
+    from urllib.request import urlopen, Request
 
 import xbmc
 import xbmcgui
 import xbmcplugin
 
-import login
-import view
+from . import login
+from . import view
 
 
 def showCatalog(args):
     """Show all animes
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
@@ -52,14 +58,14 @@ def showCatalog(args):
 
         view.add_item(args,
                       {"url":         li.a["href"],
-                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
-                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
+                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
                        "mode":        "list_season",
                        "thumb":       thumb,
                        "fanart":      thumb,
                        "rating":      str(10 - len(star) * 2),
-                       "plot":        plot.contents[3].string.strip().encode("utf-8"),
-                       "year":        li.time.string.strip().encode("utf-8")},
+                       "plot":        plot.contents[3].string.strip(),
+                       "year":        li.time.string.strip()},
                       isFolder=True, mediatype="video")
 
     view.endofdirectory()
@@ -68,8 +74,8 @@ def showCatalog(args):
 def listLastEpisodes(args):
     """Show last aired episodes
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2")
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "js-slider-lastEp"})
@@ -85,11 +91,11 @@ def listLastEpisodes(args):
 
         view.add_item(args,
                       {"url":       li.a["href"],
-                       "title":     li.img["alt"].encode("utf-8"),
+                       "title":     li.img["alt"],
                        "mode":      "videoplay",
                        "thumb":     thumb,
                        "fanart":    thumb,
-                       "plot":      li.find("a", {"class": "slider_item_season"}).string.strip().encode("utf-8"),
+                       "plot":      li.find("a", {"class": "slider_item_season"}).string.strip(),
                        "playcount": "1" if progress > 90 else "0",
                        "progress":  str(progress)},
                       isFolder=False, mediatype="video")
@@ -100,8 +106,8 @@ def listLastEpisodes(args):
 def listLastSimulcasts(args):
     """Show last simulcasts
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2")
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "js-slider-lastShow"})
@@ -119,14 +125,14 @@ def listLastSimulcasts(args):
 
         view.add_item(args,
                       {"url":         li.a["href"],
-                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
-                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
+                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
                        "mode":        "list_season",
                        "thumb":       thumb,
                        "fanart":      thumb,
                        "rating":      str(10 - len(star) * 2),
-                       "plot":        plot.contents[3].string.strip().encode("utf-8"),
-                       "year":        li.time.string.strip().encode("utf-8")},
+                       "plot":        plot.contents[-1].string.strip(),
+                       "year":        li.time.string.strip()},
                       isFolder=True, mediatype="video")
 
     view.endofdirectory()
@@ -139,9 +145,9 @@ def searchAnime(args):
     if not d:
         return
 
-    post_data = urllib.urlencode({"search": d})
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data)
-    html = response.read()
+    post_data = urlencode({"search": d})
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data.encode("utf-8"))
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
@@ -159,13 +165,13 @@ def searchAnime(args):
 
         view.add_item(args,
                       {"url":    li.a["href"],
-                       "title":  li.find("div", {"class": "slider_item_description"}).span.strong.string.strip().encode("utf-8"),
+                       "title":  li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
                        "mode":   "list_season",
                        "thumb":  thumb,
                        "fanart": thumb,
                        "rating": str(10 - len(star) * 2),
-                       "plot":   plot.contents[3].string.strip().encode("utf-8"),
-                       "year":   li.time.string.strip().encode("utf-8")},
+                       "plot":   plot.contents[3].string.strip(),
+                       "year":   li.time.string.strip()},
                       isFolder=True, mediatype="video")
 
     view.endofdirectory()
@@ -174,8 +180,8 @@ def searchAnime(args):
 def myWatchlist(args):
     """Show all episodes on watchlist
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/watchlist")
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/watchlist")
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     section = soup.find("section")
@@ -191,7 +197,7 @@ def myWatchlist(args):
 
         view.add_item(args,
                       {"url":       div.find("div", {"class": "slider_item_inner"}).a["href"],
-                       "title":     div.img["alt"].encode("utf-8"),
+                       "title":     div.img["alt"],
                        "mode":      "videoplay",
                        "thumb":     thumb.replace(" ", "%20"),
                        "fanart":    thumb.replace(" ", "%20"),
@@ -206,8 +212,8 @@ def myDownloads(args):
     """View download able animes
     May not every episode is download able.
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/mydownloads")
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/mydownloads")
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
@@ -222,7 +228,7 @@ def myDownloads(args):
 
         view.add_item(args,
                       {"url":    div.a["href"].replace("mydownloads/detail", "catalogue/show"),
-                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
+                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip(),
                        "mode":   "list_season",
                        "thumb":  thumb,
                        "fanart": thumb},
@@ -234,8 +240,8 @@ def myDownloads(args):
 def myCollection(args):
     """View collection
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/collection")
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/collection")
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
@@ -250,7 +256,7 @@ def myCollection(args):
 
         view.add_item(args,
                       {"url":    div.a["href"].replace("collection/detail", "catalogue/show"),
-                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip().encode("utf-8"),
+                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip(),
                        "mode":   "list_season",
                        "thumb":  thumb,
                        "fanart": thumb},
@@ -262,18 +268,18 @@ def myCollection(args):
 def listSeason(args):
     """Show all seasons/arcs of an anime
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv" + args.url)
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
 
     date = soup.find_all("span", {"class": "border-list_text"})[0].find_all("span")
-    year = date[2].string.strip().encode("utf-8")
-    date = year + "-" + date[1].string.strip().encode("utf-8") + "-" + date[0].string.strip().encode("utf-8")
-    originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip().encode("utf-8")
-    plot = soup.find("div", {"class": "serie_description"}).get_text().strip().encode("utf-8")
+    year = date[2].string.strip()
+    date = year + "-" + date[1].string.strip() + "-" + date[0].string.strip()
+    originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip()
+    plot = soup.find("div", {"class": "serie_description"}).get_text().strip()
     credits = soup.find("div", {"class": "serie_description_more"})
-    credits = credits.p.get_text().strip().encode("utf-8") if credits else ""
+    credits = credits.p.get_text().strip() if credits else ""
     trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
     try:
         trailer = trailer.iframe["src"]
@@ -295,11 +301,11 @@ def listSeason(args):
 
         view.add_item(args,
                       {"url":           args.url,
-                       "title":         title.encode("utf-8"),
+                       "title":         title,
                        "mode":          "list_episodes",
                        "thumb":         args.thumb.replace(" ", "%20"),
                        "fanart":        args.fanart.replace(" ", "%20"),
-                       "season":        title.encode("utf-8"),
+                       "season":        title,
                        "plot":          plot,
                        "plotoutline":   getattr(args, "plot", ""),
                        "year":          year,
@@ -315,13 +321,13 @@ def listSeason(args):
 def listEpisodes(args):
     """Show all episodes of an season/arc
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv" + args.url)
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
 
     for section in soup.find_all("section", {"class": "seasonSection"}):
-        season = section.find("h2", {"class": "slider-section_title"}).get_text().split("%", 1)[1].strip().encode("utf-8")
+        season = section.find("h2", {"class": "slider-section_title"}).get_text().split("%", 1)[1].strip()
         if season != args.title:
             continue
         for li in section.find_all("li", {"class": "slider_item"}):
@@ -332,7 +338,7 @@ def listEpisodes(args):
 
             view.add_item(args,
                           {"url":       li.a["href"],
-                           "title":     li.img["alt"].encode("utf-8"),
+                           "title":     li.img["alt"],
                            "mode":      "videoplay",
                            "thumb":     thumb.replace(" ", "%20"),
                            "fanart":    args.fanart.replace(" ", "%20"),
@@ -347,8 +353,8 @@ def listEpisodes(args):
 def startplayback(args):
     """Plays a video
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    response = urlopen("https://www.wakanim.tv" + args.url)
+    html = response.read().decode("utf-8")
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -362,12 +368,12 @@ def startplayback(args):
     if "reactivate" in html:
         # reactivate video
         a = soup.find("div", {"id": "jwplayer-container"}).a["href"]
-        response = urllib2.urlopen("https://www.wakanim.tv" + a)
-        html = response.read()
+        response = urlopen("https://www.wakanim.tv" + a)
+        html = response.read().decode("utf-8")
 
         # reload page
-        response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-        html = response.read()
+        response = urlopen("https://www.wakanim.tv" + args.url)
+        html = response.read().decode("utf-8")
         soup = BeautifulSoup(html, "html.parser")
 
         # check if successfull
@@ -402,7 +408,7 @@ def startplayback(args):
                 # mpd dash
                 is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha")
                 if is_helper.check_inputstream():
-                    url = urllib.unquote(re.search(r"manifest=(.*?)\&", html).group(1))
+                    url = unquote(re.search(r"manifest=(.*?)\&", html).group(1))
                     item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
                     item.setMimeType("application/dash+xml")
                     item.setContentLookup(False)
@@ -412,7 +418,7 @@ def startplayback(args):
                     item.setProperty("inputstream.adaptive.manifest_type", "mpd")
                     # get key url
                     item.setProperty("inputstream.adaptive.license_key", re.search(r"url: \"(.*?)\",", html).group(1)
-                                     + "|" + urllib.urlencode({"Authorization": re.search(r"value: \"(.*?)\"", html).group(1)})
+                                     + "|" + urlencode({"Authorization": re.search(r"value: \"(.*?)\"", html).group(1)})
                                      + "&User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|")
                     item.setProperty("inputstreamaddon", "inputstream.adaptive")
                     item.setProperty("IsPlayable", "true")
@@ -464,11 +470,11 @@ def startplayback(args):
 
                     # send data
                     try:
-                        req = urllib2.Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
-                                              json.dumps(post),
+                        req = Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
+                                              json.dumps(post).encode("utf-8"),
                                               headers={"Content-type": "application/json"})
-                        response = urllib2.urlopen(req)
-                        html = response.read()
+                        response = urlopen(req)
+                        html = response.read().decode("utf-8")
                     except ssl.SSLError:
                         # catch timeout exception
                         pass
