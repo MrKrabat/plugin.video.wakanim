@@ -433,7 +433,7 @@ def startplayback(args):
 
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
-        if True:
+        if args._addon.getSetting("sync_playtime") == "true":
             # get required infos
             player = xbmc.Player()
             regex = r"idepisode=(.*?)&(?:.*?)&idserie=(.*?)\","

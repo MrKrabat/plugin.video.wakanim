@@ -43,6 +43,10 @@ def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
     """Add item to directory listing.
     """
 
+    if args._addon.getSetting("sync_playtime") == "false":
+        info.pop("playcount", None)
+        info.pop("progress", None)
+
     # create list item
     li = xbmcgui.ListItem(label = info["title"])
 
