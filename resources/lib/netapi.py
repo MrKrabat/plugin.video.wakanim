@@ -359,13 +359,13 @@ def startplayback(args):
     soup = BeautifulSoup(html, "html.parser")
 
     # check if not premium
-    if ("Diese Folge ist für Abonnenten reserviert" in html) or ("Cet épisode est reservé à nos abonnés" in html) or ("This episode is reserved for our subscribers" in html) or ("Эта серия зарезервирована для наших подписчиков" in html):
+    if (u"Diese Folge ist für Abonnenten reserviert" in html) or (u"Cet épisode est reservé à nos abonnés" in html) or (u"This episode is reserved for our subscribers" in html) or (u"Эта серия зарезервирована для наших подписчиков" in html):
         xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
         xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
         return
 
     # check if we have to reactivate video
-    if "reactivate" in html:
+    if u"reactivate" in html:
         # reactivate video
         a = soup.find("div", {"id": "jwplayer-container"}).a["href"]
         response = urlopen("https://www.wakanim.tv" + a)
@@ -377,15 +377,15 @@ def startplayback(args):
         soup = BeautifulSoup(html, "html.parser")
 
         # check if successfull
-        if "reactivate" in html:
+        if u"reactivate" in html:
             xbmc.log("[PLUGIN] %s: Reactivation failed '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30042))
             return
 
     # playing stream
-    if "jwplayer-container" in html:
+    if u"jwplayer-container" in html:
         # streaming is only for premium subscription
-        if (("<span>Kostenlos</span>" in html) or ("<span>Gratuit</span>" in html) or ("<span>Free</span>" in html) or ("<span>Бесплатный аккаунт</span>" in html)) and not ("episode_premium_title" in html):
+        if ((u"<span>Kostenlos</span>" in html) or (u"<span>Gratuit</span>" in html) or (u"<span>Free</span>" in html) or (u"<span>Бесплатный аккаунт</span>" in html)) and not (u"episode_premium_title" in html):
             xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
             return
@@ -399,7 +399,7 @@ def startplayback(args):
             url = "https://www.wakanim.tv" + matches + login.getCookie(args)
 
             # play stream
-            if "type: 'hls'," in html:
+            if u"type: 'hls'," in html:
                 # hls+aes
                 item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
                 item.setMimeType("application/vnd.apple.mpegurl")
