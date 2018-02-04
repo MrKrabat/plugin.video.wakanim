@@ -85,7 +85,7 @@ def check_mode(args):
         # call from other plugin
         mode = "videoplay"
         args.url = "/" + args._country + "/v2/catalogue/episode/" + args.id
-    elif hasattr(args, "id"):
+    elif hasattr(args, "url"):
         # call from other plugin
         mode = "videoplay"
         args.url = args.url[22:]
