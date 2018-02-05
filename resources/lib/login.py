@@ -30,13 +30,11 @@ except ImportError:
     from http.cookiejar import LWPCookieJar
 
 import xbmc
+import xbmcgui
 
-
-def login(username, password, args):
-    """Login and session handler
+def loadCookies(args):
+    """Load cookies and install urllib2 opener
     """
-    login_url = "https://www.wakanim.tv/" + args._country + "/v2/account/login?ReturnUrl=%2Fde%2Fv2%2Fdiscover"
-
     # create cookie path
     cookiepath = os.path.join(
         xbmc.translatePath(args._addon.getAddonInfo("profile")),
@@ -52,21 +50,33 @@ def login(username, password, args):
     opener.addheaders = [("Accept-Charset", "utf-8")]
     install_opener(opener)
 
-    # check if session exists
+    # load cookies
     try:
         cj.load(cookiepath, ignore_discard=True)
-
-        # check if session is valid
-        response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
-        html = response.read().decode("utf-8")
-
-        if (u"Meine Benachrichtigungen verwalten" in html) or (u"Gérer mes notifications" in html) or (u"Manage my notifications" in html) or (u"Настройки уведомлений" in html):
-            # session is valid
-            return True
-
     except IOError:
         # cookie file does not exist
         pass
+
+def saveCookies(args):
+    args._cj.save(os.path.join(xbmc.translatePath(args._addon.getAddonInfo("profile")), "cookies.lwp"), ignore_discard=True)
+
+
+def check_loggedin(html):
+    return 'header-main_user_name' in html
+
+
+def getHTML(args, url, data=None):
+    """Load HTML and login if necessary
+    """
+    response = urlopen(url, data)
+    html = response.read().decode(response.headers.get_content_charset())
+
+    if check_loggedin(html):
+        return html
+
+    login_url = "https://www.wakanim.tv/" + args._country + "/v2/account/login?ReturnUrl=" + urllib.quote_plus(url.replace("https://www.wakanim.tv", ''))
+    username = args._addon.getSetting("wakanim_username")
+    password = args._addon.getSetting("wakanim_password")
 
     # build POST data
     post_data = urlencode({"username": username,
@@ -74,17 +84,21 @@ def login(username, password, args):
                            "remember": "1"})
 
     # POST to login page
-    response = urlopen(login_url, post_data.encode("utf-8"))
+    response = urlopen(login_url, post_data.encode(response.headers.get_content_charset()))
 
+    if data:
+        response = urlopen(url, data)
     # check for login string
-    html = response.read().decode("utf-8")
+    html = response.read().decode(response.headers.get_content_charset())
 
-    if (u"Meine Benachrichtigungen verwalten" in html) or (u"Gérer mes notifications" in html) or (u"Manage my notifications" in html) or (u"Настройки уведомлений" in html):
+    if check_loggedin(html):
         # save session to disk
-        cj.save(cookiepath, ignore_discard=True)
-        return True
+        saveCookies(args)
+        return html
     else:
-        return False
+        xbmc.log("[PLUGIN] %s: Login failed" % args._addonname, xbmc.LOGERROR)
+        xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30040))
+        return ""
 
 
 def getCookie(args):
