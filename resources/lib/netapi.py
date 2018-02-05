@@ -22,7 +22,6 @@ import time
 import json
 import urllib
 import urllib2
-import inputstreamhelper
 from bs4 import BeautifulSoup
 
 import xbmc
@@ -31,6 +30,7 @@ import xbmcplugin
 
 import login
 import view
+from streamparams import getStreamParams
 
 
 def showCatalog(args):
@@ -382,52 +382,15 @@ def startplayback(args):
             return
 
         # get stream parameters
-        try:
-            html = re.search(r"jwplayer\(\"jwplayer-container\"\).setup\({(.+?)}\);", html, re.DOTALL).group(1)
-            url = "https://www.wakanim.tv" + re.search(r"file: \"(.*?)\",", html).group(1)
-            stream_type = re.search(r"type: '(.*?)',", html).group(1)
-        except:
-            xbmc.log("[PLUGIN] %s: Invalid JWPlayer config" % args._addonname, xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
-            return
+        params = getStreamParams(args, html)
+        if not params: return
 
         # play stream
-        if stream_type == "hls":
-            # hls+aes
-            url += login.getCookie(args)
-            item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
-            item.setMimeType("application/vnd.apple.mpegurl")
-            item.setContentLookup(False)
-        elif stream_type == "dash":
-            # mpd dash
-            m = re.search(r"manifest=(.+?)\&", url)
-            if m: url = urllib.unquote(m.group(1))
-            item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
-            item.setMimeType("application/dash+xml")
-            item.setContentLookup(False)
-            # get headers
-            item.setProperty("inputstream.adaptive.stream_headers", login.getCookie(args)[1:])
-            item.setProperty("inputstream.adaptive.manifest_type", "mpd")
-            m = re.search(r"widevine.+?url: \"(.+?)\",(.*?headers:\s*\[(.*?)\])?", html, re.DOTALL)
-            if m:
-                item.setProperty("inputstream.adaptive.license_type", "com.widevine.alpha")
-                # get key url
-                headers = ""
-                if m.group(3):
-                    for i in re.finditer(r"name:\s*\"(.+?)\",.*?value:\s*\"(.+?)\"", m.group(3), re.DOTALL):
-                        headers += urllib.urlencode({i.group(1): i.group(2)}) + "&"
-                headers += "User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|"
-                item.setProperty("inputstream.adaptive.license_key", m.group(1) + "|" + headers)
-            item.setProperty("inputstreamaddon", "inputstream.adaptive")
-            item.setProperty("IsPlayable", "true")
-            is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha" if m else None)
-            if not is_helper.check_inputstream():
-                xbmc.log("[PLUGIN] %s: InputStreamHelper check stream failed" % args._addonname, xbmc.LOGERROR)
-                return
-        else:
-            xbmc.log("[PLUGIN] %s: Invalid stream type %s" % (args._addonname, stream_type), xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
-            return
+        item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=params['url'])
+        if params['content-type']: item.setMimeType(params['content-type'])
+        for k,v in params['properties'].iteritems(): item.setProperty(k, v)
+        item.setProperty("IsPlayable", "true")
+        item.setContentLookup(False)
 
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
