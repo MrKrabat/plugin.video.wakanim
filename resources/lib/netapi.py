@@ -383,12 +383,16 @@ def startplayback(args):
 
         # get stream parameters
         params = getStreamParams(args, html)
-        if not params: return
+        if not params:
+            return
 
         # play stream
-        item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=params['url'])
-        if params['content-type']: item.setMimeType(params['content-type'])
-        for k,v in params['properties'].iteritems(): item.setProperty(k, v)
+        url = params['url']
+        item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
+        if params['content-type']:
+            item.setMimeType(params['content-type'])
+        for k,v in params['properties'].iteritems():
+            item.setProperty(k, v)
         item.setProperty("IsPlayable", "true")
         item.setContentLookup(False)
 
