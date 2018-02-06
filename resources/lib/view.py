@@ -27,11 +27,11 @@ import xbmcplugin
 
 
 # keys allowed in setInfo
-types = ["count", "size", "date", "genre", "year", "episode", "season", "top250", "tracknumber",
-         "rating", "userrating", "watched", "playcount", "overlay", "cast", "castandrole", "director",
-         "mpaa", "plot", "plotoutline", "title", "originaltitle", "sorttitle", "duration", "studio",
-         "tagline", "writer", "tvshowtitle", "premiered", "status", "code", "aired", "credits", "lastplayed",
-         "album", "artist", "votes", "trailer", "dateadded", "mediatype"]
+types = ["count", "size", "date", "genre", "country", "year", "episode", "season", "sortepisode", "top250", "setid",
+         "tracknumber", "rating", "userrating", "watched", "playcount", "overlay", "cast", "castandrole", "director",
+         "mpaa", "plot", "plotoutline", "title", "originaltitle", "sorttitle", "duration", "studio", "tagline", "writer",
+         "tvshowtitle", "premiered", "status", "set", "setoverview", "tag", "imdbnumber", "code", "aired", "credits",
+         "lastplayed", "album", "artist", "votes", "path", "trailer", "dateadded", "mediatype", "dbid"]
 
 
 def endofdirectory():
