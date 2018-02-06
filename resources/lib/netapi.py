@@ -145,7 +145,7 @@ def searchAnime(args):
     if not d:
         return
 
-    post_data = urllib.urlencode({"search": d})
+    post_data = urlencode({"search": d})
     html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data.encode("utf-8"))
 
     soup = BeautifulSoup(html, "html.parser")
@@ -323,9 +323,16 @@ def listEpisodes(args):
 
     soup = BeautifulSoup(html, "html.parser")
 
+    my_season = args.title
+    try:
+        if not isinstance(my_season, unicode):
+            my_season = str(my_season).decode("utf-8")
+    except:
+        pass
+
     for section in soup.find_all("section", {"class": "seasonSection"}):
         season = section.find("h2", {"class": "slider-section_title"}).get_text().split("%", 1)[1].strip()
-        if season != args.title:
+        if season != my_season:
             continue
         for li in section.find_all("li", {"class": "slider_item"}):
             progress = int(li.find("div", {"class": "ProgressBar"}).get("data-progress"))
@@ -366,12 +373,10 @@ def startplayback(args):
 
         # reactivate video
         a = soup.find("div", {"id": "jwplayer-container"}).a["href"]
-        response = urlopen("https://www.wakanim.tv" + a)
-        html = response.read().decode(response.headers.get_content_charset())
+        urlopen("https://www.wakanim.tv" + a)
 
         # reload page
-        response = urlopen("https://www.wakanim.tv" + args.url)
-        html = response.read().decode(response.headers.get_content_charset())
+        html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
 
         # check if successfull
         if u"reactivate" in html:
@@ -394,7 +399,7 @@ def startplayback(args):
         # play stream
         item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=params['url'])
         if params['content-type']: item.setMimeType(params['content-type'])
-        for k,v in params['properties'].iteritems(): item.setProperty(k, v)
+        for k,v in list(params['properties'].items()): item.setProperty(k, v)
         item.setProperty("IsPlayable", "true")
         item.setContentLookup(False)
 
@@ -444,8 +449,7 @@ def startplayback(args):
                         req = Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
                                               json.dumps(post).encode("utf-8"),
                                               headers={"Content-type": "application/json"})
-                        response = urlopen(req)
-                        html = response.read().decode("utf-8")
+                        urlopen(req)
                     except ssl.SSLError:
                         # catch timeout exception
                         pass

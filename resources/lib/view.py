@@ -85,7 +85,13 @@ def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
 
 
 def quote_value(value):
-    return quote_plus(value.encode("utf8") if not isinstance(value, str) else value)
+    """Proper quote on both python2 and python3 (feature detection)
+       Remove after python3 migration
+    """
+    try:
+        return quote_plus(value.encode("utf-8") if isinstance(value, unicode) else value)
+    except NameError:
+        return quote_plus(value)
 
 
 def build_url(args, info):
