@@ -36,7 +36,7 @@ import xbmcplugin
 
 from . import login
 from . import view
-from streamparams import getStreamParams
+from .streamparams import getStreamParams
 
 
 def showCatalog(args):
@@ -276,8 +276,8 @@ def listSeason(args):
     date = year + "-" + date[1].string.strip() + "-" + date[0].string.strip()
     originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip()
     plot = soup.find("div", {"class": "serie_description"}).get_text().strip()
-    credits = soup.find("div", {"class": "serie_description_more"})
-    credits = credits.p.get_text().strip() if credits else ""
+    credit = soup.find("div", {"class": "serie_description_more"})
+    credit = credit.p.get_text().strip() if credit else ""
     trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
     try:
         trailer = trailer.iframe["src"]
@@ -310,7 +310,7 @@ def listSeason(args):
                        "premiered":     date,
                        "trailer":       trailer,
                        "originaltitle": originaltitle,
-                       "credits":       credits},
+                       "credits":       credit},
                       isFolder=True, mediatype="video")
 
     view.endofdirectory()

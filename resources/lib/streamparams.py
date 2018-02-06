@@ -26,7 +26,7 @@ import xbmc
 import xbmcgui
 
 import inputstreamhelper
-from login import getCookie
+from .login import getCookie
 
 
 def log(args, msg, lvl=xbmc.LOGDEBUG):
@@ -224,7 +224,7 @@ def getStreamParams(args, html):
     if result['drm']:
         params[a+'.license_type'] = result['drm']
         headers = ""
-        for k,v in result['headers'].iteritems():
+        for k,v in list(result['headers'].items()):
             headers += urlencode({k: v}) + "&"
         headers += "User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|"
         params[a+'.license_key'] = result['key'] + "|" + headers
