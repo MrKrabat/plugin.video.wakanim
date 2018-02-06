@@ -22,9 +22,9 @@ import time
 import json
 from bs4 import BeautifulSoup
 try:
-    from urllib import urlencode, unquote
+    from urllib import urlencode
 except ImportError:
-    from urllib.parse import urlencode, unquote
+    from urllib.parse import urlencode
 try:
     from urllib2 import urlopen, Request
 except ImportError:
@@ -327,7 +327,7 @@ def listEpisodes(args):
     try:
         if not isinstance(my_season, unicode):
             my_season = str(my_season).decode("utf-8")
-    except:
+    except (NameError, AttributeError):
         pass
 
     for section in soup.find_all("section", {"class": "seasonSection"}):
@@ -373,7 +373,7 @@ def startplayback(args):
 
         # reactivate video
         a = soup.find("div", {"id": "jwplayer-container"}).a["href"]
-        urlopen("https://www.wakanim.tv" + a)
+        login.getHTML(args, "https://www.wakanim.tv" + a)
 
         # reload page
         html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
@@ -453,7 +453,8 @@ def startplayback(args):
                         req = Request("https://www.wakanim.tv/" + args._country + "/v2/svod/saveplaytimeprogress",
                                               json.dumps(post).encode("utf-8"),
                                               headers={"Content-type": "application/json"})
-                        urlopen(req)
+                        response = urlopen(req)
+                        html = response.read()
                     except ssl.SSLError:
                         # catch timeout exception
                         pass
