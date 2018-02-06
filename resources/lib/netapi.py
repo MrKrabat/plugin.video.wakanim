@@ -22,7 +22,6 @@ import time
 import json
 import urllib
 import urllib2
-import inputstreamhelper
 from bs4 import BeautifulSoup
 
 import xbmc
@@ -31,13 +30,16 @@ import xbmcplugin
 
 import login
 import view
+from streamparams import getStreamParams
 
 
 def showCatalog(args):
     """Show all animes
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue")
+    if not html:
+        view.endofdirectory()
+        return
 
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
@@ -68,8 +70,7 @@ def showCatalog(args):
 def listLastEpisodes(args):
     """Show last aired episodes
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "js-slider-lastEp"})
@@ -100,8 +101,7 @@ def listLastEpisodes(args):
 def listLastSimulcasts(args):
     """Show last simulcasts
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "js-slider-lastShow"})
@@ -140,8 +140,7 @@ def searchAnime(args):
         return
 
     post_data = urllib.urlencode({"search": d})
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", post_data)
 
     soup = BeautifulSoup(html, "html.parser")
     ul = soup.find("ul", {"class": "catalog_list"})
@@ -174,8 +173,7 @@ def searchAnime(args):
 def myWatchlist(args):
     """Show all episodes on watchlist
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/watchlist")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/watchlist")
 
     soup = BeautifulSoup(html, "html.parser")
     section = soup.find("section")
@@ -206,8 +204,7 @@ def myDownloads(args):
     """View download able animes
     May not every episode is download able.
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/mydownloads")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/mydownloads")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
@@ -234,8 +231,7 @@ def myDownloads(args):
 def myCollection(args):
     """View collection
     """
-    response = urllib2.urlopen("https://www.wakanim.tv/" + args._country + "/v2/collection")
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv/" + args._country + "/v2/collection")
 
     soup = BeautifulSoup(html, "html.parser")
     container = soup.find("div", {"class": "big-item-list"})
@@ -262,8 +258,10 @@ def myCollection(args):
 def listSeason(args):
     """Show all seasons/arcs of an anime
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
+    if not html:
+        view.endofdirectory()
+        return
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -315,8 +313,7 @@ def listSeason(args):
 def listEpisodes(args):
     """Show all episodes of an season/arc
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
+    html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -347,10 +344,9 @@ def listEpisodes(args):
 def startplayback(args):
     """Plays a video
     """
-    response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
-    html = response.read()
-
-    soup = BeautifulSoup(html, "html.parser")
+    html = login.getHTML(args, "https://www.wakanim.tv" + args.url)
+    if not html:
+        return
 
     # check if not premium
     if ("Diese Folge ist für Abonnenten reserviert" in html) or ("Cet épisode est reservé à nos abonnés" in html) or ("This episode is reserved for our subscribers" in html) or ("Эта серия зарезервирована для наших подписчиков" in html):
@@ -360,6 +356,8 @@ def startplayback(args):
 
     # check if we have to reactivate video
     if "reactivate" in html:
+        soup = BeautifulSoup(html, "html.parser")
+
         # reactivate video
         a = soup.find("div", {"id": "jwplayer-container"}).a["href"]
         response = urllib2.urlopen("https://www.wakanim.tv" + a)
@@ -368,7 +366,6 @@ def startplayback(args):
         # reload page
         response = urllib2.urlopen("https://www.wakanim.tv" + args.url)
         html = response.read()
-        soup = BeautifulSoup(html, "html.parser")
 
         # check if successfull
         if "reactivate" in html:
@@ -384,46 +381,24 @@ def startplayback(args):
             xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))
             return
 
-        # get stream file
-        regex = r"file: \"(.*?)\","
-        matches = re.search(regex, html).group(1)
+        # get stream parameters
+        params = getStreamParams(args, html)
+        if not params:
+            return
 
-        if matches:
-            # manifest url
-            url = "https://www.wakanim.tv" + matches + login.getCookie(args)
+        # play stream
+        url = params['url']
+        item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
+        if params['content-type']:
+            item.setMimeType(params['content-type'])
+        for k,v in params['properties'].iteritems():
+            item.setProperty(k, v)
+        item.setProperty("IsPlayable", "true")
+        item.setContentLookup(False)
 
-            # play stream
-            if "type: 'hls'," in html:
-                # hls+aes
-                item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
-                item.setMimeType("application/vnd.apple.mpegurl")
-                item.setContentLookup(False)
-            else:
-                # mpd dash
-                is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha")
-                if is_helper.check_inputstream():
-                    url = urllib.unquote(re.search(r"manifest=(.*?)\&", html).group(1))
-                    item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"), path=url)
-                    item.setMimeType("application/dash+xml")
-                    item.setContentLookup(False)
-                    # get headers
-                    item.setProperty("inputstream.adaptive.stream_headers", login.getCookie(args)[1:])
-                    item.setProperty("inputstream.adaptive.license_type", "com.widevine.alpha")
-                    item.setProperty("inputstream.adaptive.manifest_type", "mpd")
-                    # get key url
-                    item.setProperty("inputstream.adaptive.license_key", re.search(r"url: \"(.*?)\",", html).group(1)
-                                     + "|" + urllib.urlencode({"Authorization": re.search(r"value: \"(.*?)\"", html).group(1)})
-                                     + "&User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|")
-                    item.setProperty("inputstreamaddon", "inputstream.adaptive")
-                    item.setProperty("IsPlayable", "true")
-                else:
-                    xbmc.log("[PLUGIN] %s: Inputstreamhelper failed to install Widevine" % args._addonname, xbmc.LOGERROR)
-                    item = xbmcgui.ListItem(getattr(args, "title", "Title not provided"))
-                    xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, item)
-                    return False
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
-
+        if args._addon.getSetting("sync_playtime") == "true":
             # get required infos
             player = xbmc.Player()
             regex = r"idepisode=(.*?)&(?:.*?)&idserie=(.*?)\","
@@ -474,10 +449,6 @@ def startplayback(args):
                         pass
             except RuntimeError:
                 xbmc.log("[PLUGIN] %s: Playback aborted" % args._addonname, xbmc.LOGDEBUG)
-        else:
-            xbmc.log("[PLUGIN] %s: Failed to play stream" % args._addonname, xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30044))
-
     else:
         xbmc.log("[PLUGIN] %s: You need to own this video or be a premium member '%s'" % (args._addonname, args.url), xbmc.LOGERROR)
         xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30043))

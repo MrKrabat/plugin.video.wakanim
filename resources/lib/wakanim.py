@@ -62,18 +62,12 @@ def main():
         # open addon settings
         args._addon.openSettings()
         return False
-    else:
-        # login
-        success = login.login(username, password, args)
-        if success:
-            # list menue
-            xbmcplugin.setContent(int(sys.argv[1]), "tvshows")
-            check_mode(args)
-        else:
-            # login failed
-            xbmc.log("[PLUGIN] %s: Login failed" % args._addonname, xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30040))
-            return False
+
+    xbmcplugin.setContent(int(sys.argv[1]), "tvshows")
+
+    login.loadCookies(args)
+    check_mode(args)
+    login.saveCookies(args)
 
 
 def check_mode(args):
