@@ -16,20 +16,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import urllib
 import json
+try:
+    from urllib import unquote, urlencode
+except ImportError:
+    from urllib.parse import unquote, urlencode
 
 import xbmc
 import xbmcgui
 
 import inputstreamhelper
-from login import getCookie
+from .login import getCookie
 
 
 def log(args, msg, lvl=xbmc.LOGDEBUG):
     """Log msg to Kodi journal
     """
-    xbmc.log("[PLUGIN] %s: %s" % (args._addonname, msg), lvl)
+    xbmc.log("[PLUGIN] {0}: {1}".format(args._addonname, msg), lvl)
 
 
 def errdlg(args):
@@ -92,6 +95,16 @@ def parse_stream_config(html, prefix):
     return json.loads("{" + result)
 
 
+def enc(s):
+    """For python2 encode unicode strings to utf-8
+       Remove after python3 migration
+    """
+    try:
+        return s.encode("utf-8") if isinstance(s, unicode) else s
+    except NameError:
+        return s
+
+
 def get_stream_params_from_json(data):
     """Get stream parameters from JSON format
        Parameters:
@@ -105,8 +118,8 @@ def get_stream_params_from_json(data):
          'headers': additional headers to pass to license server
     """
     result = {}
-    result['url'] = data[u'file'].encode("utf-8")
-    result['proto'] = data[u'type'].encode("utf-8")
+    result['url'] = enc(data[u'file'])
+    result['proto'] = enc(data[u'type'])
     drm = data.get(u'drm', None)
     if not drm:
         result['drm'] = None
@@ -116,10 +129,10 @@ def get_stream_params_from_json(data):
         drm = drm[u'widevine']
     else:
         # if no 'widewine' get first license type from drm list
-        result['drm'], drm = next(drm.iteritems())
-        result['drm'] = result['drm'].encode("utf-8")
-    result['key'] = drm[u'url'].encode("utf-8")
-    result['headers'] = {h['name'].encode("utf-8"): h['value'].encode("utf-8") for h in drm.get(u'headers', [])}
+        result['drm'], drm = next(iter(drm.items()))
+        result['drm'] = enc(result['drm'])
+    result['key'] = enc(drm[u'url'])
+    result['headers'] = {enc(h[u'name']): enc(h[u'value']) for h in drm.get(u'headers', [])}
     return result
 
 
@@ -132,7 +145,7 @@ def get_stream_params_fallback(html):
     try:
         result = {}
         # get JWPlayer config and search params only in it
-        html = re.search(r"jwplayer\(\"jwplayer-container\"\).setup\({(.+?)}\);", html, re.DOTALL).group(1)
+        html = enc(re.search(r"jwplayer\(\"jwplayer-container\"\).setup\({(.+?)}\);", html, re.DOTALL).group(1))
         # regex 'key: "value", can process single or double quotes
         result['url'] = re.search(r"file:\s*(?P<q>['\"])(.+?)(?<!\\)(?P=q),", html).group(2)
         result['proto'] = re.search(r"type:\s*(?P<q>['\"])(.+?)(?<!\\)(?P=q),", html).group(2)
@@ -175,7 +188,7 @@ def getStreamParams(args, html):
         errdlg(args)
         return None
 
-    log(args, "Stream proto '%s' drm '%s'" % (result['proto'], result['drm']), xbmc.LOGDEBUG)
+    log(args, "Stream proto '{0}' drm '{1}'".format(result['proto'], result['drm']), xbmc.LOGDEBUG)
 
     # prepare stream parameters
     if not result['url'].startswith("http"):
@@ -185,23 +198,23 @@ def getStreamParams(args, html):
         return {'legacy': True, 'url': result['url'] + getCookie(args), 'content-type': "application/vnd.apple.mpegurl", 'properties': {}}
     if result['proto'] == "dash":
         m = re.search(r"manifest=(.+?)\&", result['url'])
-        if m: result['url'] = urllib.unquote(m.group(1))
+        if m: result['url'] = unquote(m.group(1))
         result['proto'] = "mpd"
         result['content-type'] = "application/dash+xml"
     else:
-        log(args, "Unknown stream protocol '%s'" % result['proto'], xbmc.LOGNOTICE)
+        log(args, "Unknown stream protocol '{0}'".format(result['proto']), xbmc.LOGNOTICE)
     if result['drm'] == "widevine":
         result['drm'] = "com.widevine.alpha"
     else:
-        log(args, "Unknown stream license type '%s'" % result['drm'], xbmc.LOGNOTICE)
+        log(args, "Unknown stream license type '{0}'".format(result['drm']), xbmc.LOGNOTICE)
 
     # check stream parameters with InputStreamHelper
     try:
         if not inputstreamhelper.Helper(result['proto'], result['drm']).check_inputstream():
             log(args, "InputStreamHelper: check stream failed", xbmc.LOGERROR)
             return None
-    except inputstreamhelper.Helper.InputStreamException, e:
-        log(args, "InputStreamHelper: %s" % e, xbmc.LOGERROR)
+    except inputstreamhelper.Helper.InputStreamException as e:
+        log(args, "InputStreamHelper: {0}".format(e), xbmc.LOGERROR)
         errdlg(args)
         return None
 
@@ -211,9 +224,8 @@ def getStreamParams(args, html):
     if result['drm']:
         params[a+'.license_type'] = result['drm']
         headers = ""
-        for k,v in result['headers'].iteritems():
-            headers += urllib.urlencode({k: v}) + "&"
+        for k,v in list(result['headers'].items()):
+            headers += urlencode({k: v}) + "&"
         headers += "User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|"
         params[a+'.license_key'] = result['key'] + "|" + headers
     return {'legacy': False, 'url': result['url'], 'content-type': result.get('content-type', None), 'properties': params}
-

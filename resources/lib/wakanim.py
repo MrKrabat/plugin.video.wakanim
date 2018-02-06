@@ -23,10 +23,10 @@ import xbmcgui
 import xbmcaddon
 import xbmcplugin
 
-import cmdargs
-import login
-import netapi
-import view
+from . import cmdargs
+from . import login
+from . import netapi
+from . import view
 
 
 def main():

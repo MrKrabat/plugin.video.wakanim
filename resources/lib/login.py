@@ -16,71 +16,103 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import cookielib
-import urllib
-import urllib2
+import cgi
+try:
+    from urllib import urlencode, quote_plus
+except ImportError:
+    from urllib.parse import urlencode, quote_plus
+try:
+    from urllib2 import urlopen, build_opener, HTTPCookieProcessor, install_opener
+except ImportError:
+    from urllib.request import urlopen, build_opener, HTTPCookieProcessor, install_opener
+try:
+    from cookielib import LWPCookieJar
+except ImportError:
+    from http.cookiejar import LWPCookieJar
 
 import xbmc
 import xbmcgui
 
+def get_cookie_path(args):
+    """Get cookie file path
+    """
+    profile_path = xbmc.translatePath(args._addon.getAddonInfo("profile"))
+    try:
+        # python2
+        return os.path.join(profile_path.decode("utf-8"), u"cookies.lwp")
+    except AttributeError:
+        # python3
+        return os.path.join(profile_path, "cookies.lwp")
+
 def loadCookies(args):
     """Load cookies and install urllib2 opener
     """
-    # create cookie path
-    cookiepath = os.path.join(
-        xbmc.translatePath(args._addon.getAddonInfo("profile")).decode("utf-8"),
-        "cookies.lwp")
-
     # create cookiejar
-    cj = cookielib.LWPCookieJar()
+    cj = LWPCookieJar()
     args._cj = cj
 
     # lets urllib2 handle cookies
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener = build_opener(HTTPCookieProcessor(cj))
     opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36")]
     opener.addheaders = [("Accept-Charset", "utf-8")]
-    urllib2.install_opener(opener)
+    install_opener(opener)
 
     # load cookies
     try:
-        cj.load(cookiepath, ignore_discard=True)
+        cj.load(get_cookie_path(args), ignore_discard=True)
     except IOError:
         # cookie file does not exist
         pass
 
 def saveCookies(args):
-    args._cj.save(os.path.join(xbmc.translatePath(args._addon.getAddonInfo("profile")).decode("utf-8"), "cookies.lwp"), ignore_discard=True)
+    """Save cookies
+    """
+    args._cj.save(get_cookie_path(args), ignore_discard=True)
 
 
 def check_loggedin(html):
-    return 'header-main_user_name' in html
+    """Check if user logged in
+    """
+    return u'header-main_user_name' in html
+
+
+def get_html_charset(r):
+    """response.headers.get_content_charset() replacement to work on python2 and python3
+    """
+    _, p = cgi.parse_header(r.headers.get("Content-Type", ""))
+    return p.get("charset", "utf-8")
+
+def get_html(r):
+    """Load HTML in Unicode
+    """
+    return r.read().decode(get_html_charset(r))
 
 
 def getHTML(args, url, data=None):
     """Load HTML and login if necessary
     """
-    response = urllib2.urlopen(url, data)
-    html = response.read()
+    response = urlopen(url, data)
+    html = get_html(response)
 
     if check_loggedin(html):
         return html
 
-    login_url = "https://www.wakanim.tv/" + args._country + "/v2/account/login?ReturnUrl=" + urllib.quote_plus(url.replace("https://www.wakanim.tv", ''))
+    login_url = "https://www.wakanim.tv/" + args._country + "/v2/account/login?ReturnUrl=" + quote_plus(url.replace("https://www.wakanim.tv", ''))
     username = args._addon.getSetting("wakanim_username")
     password = args._addon.getSetting("wakanim_password")
 
     # build POST data
-    post_data = urllib.urlencode({"username": username,
-                                  "password": password,
-                                  "remember": "1"})
+    post_data = urlencode({"username": username,
+                           "password": password,
+                           "remember": "1"})
 
     # POST to login page
-    response = urllib2.urlopen(login_url, post_data)
+    response = urlopen(login_url, post_data.encode(get_html_charset(response)))
 
     if data:
-        response = urllib2.urlopen(url, data)
+        response = urlopen(url, data)
     # check for login string
-    html = response.read()
+    html = get_html(response)
 
     if check_loggedin(html):
         # save session to disk
@@ -95,15 +127,11 @@ def getHTML(args, url, data=None):
 def getCookie(args):
     """Returns all cookies as string and urlencoded
     """
-    # create cookie path
-    cookiepath = os.path.join(
-        xbmc.translatePath(args._addon.getAddonInfo("profile")).decode("utf-8"),
-        "cookies.lwp")
     # save session to disk
-    args._cj.save(cookiepath, ignore_discard=True)
+    saveCookies(args)
 
     ret = ""
     for cookie in args._cj:
-        ret += urllib.urlencode({cookie.name: cookie.value}) + ";"
+        ret += urlencode({cookie.name: cookie.value}) + ";"
 
     return "|User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Cookie=" + ret[:-1]
