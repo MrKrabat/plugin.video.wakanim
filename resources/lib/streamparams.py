@@ -53,7 +53,8 @@ def parse_stream_config(html, prefix):
        Returns JSON object with JWPlayer config
     """
     i = html.find(prefix)
-    if i < 0: return {}
+    if i < 0:
+        return {}
     i += len(prefix)
     l = len(html)
     brace_count = 1
@@ -61,6 +62,8 @@ def parse_stream_config(html, prefix):
     quote_key = False
     # regex to string with single or double quotes
     ms = re.compile(r"(?P<q>['\"])(.*?)(?<!\\)(?P=q)")
+    # regex to replace quotes
+    mq = re.compile(r"(?<!\\)\"")
     while i < l and brace_count:
         c = html[i]
         if c.isalnum():
@@ -78,13 +81,13 @@ def parse_stream_config(html, prefix):
             if c in "\"'":
                 m = ms.match(html, i)
                 if m:
-                    result += "\"" + m.group(2) + "\""
+                    result += "\"" + mq.sub(r"\"", m.group(2)) + "\""
                     i = m.end()
                     if i >= l:
                         break
                     c = html[i]
             # count braces and stop on last '}'
-            elif c == "{":
+            if c == "{":
                 brace_count += 1
             elif c == "}":
                 brace_count -= 1
@@ -179,7 +182,7 @@ def getStreamParams(args, html):
         html = html.replace("autostart: (autoplay) ? \"true\" : \"false\"", "autostart: \"false\"")
         # try parse with JSON
         result = get_stream_params_from_json(parse_stream_config(html, "jwplayer(\"jwplayer-container\").setup({"))
-    except (ValueError, KeyError):
+    except (ValueError, KeyError, TypeError):
         log(args, "Error parsing JWPlayer config, trying old method", xbmc.LOGNOTICE)
         # fallback to old method
         result = get_stream_params_fallback(html)
@@ -228,4 +231,5 @@ def getStreamParams(args, html):
             headers += urlencode({k: v}) + "&"
         headers += "User-Agent=Mozilla%2F5.0%20%28Windows%20NT%2010.0%3B%20Win64%3B%20x64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F60.0.3112.113%20Safari%2F537.36&Content-Type=text%2Fxml&SOAPAction=http%3A%2F%2Fschemas.microsoft.com%2FDRM%2F2007%2F03%2Fprotocols%2FAcquireLicense|R{SSM}|"
         params[a+'.license_key'] = result['key'] + "|" + headers
-    return {'legacy': False, 'url': result['url'], 'content-type': result.get('content-type', None), 'properties': params}
+
+    return {'legacy': False, 'url': result['url'], 'content-type': result.get('content-type'), 'properties': params}
