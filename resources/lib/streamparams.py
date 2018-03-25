@@ -26,7 +26,7 @@ import xbmc
 import xbmcgui
 
 import inputstreamhelper
-from .login import getCookie
+from .api import getCookies
 
 
 def log(args, msg, lvl=xbmc.LOGDEBUG):
@@ -198,7 +198,7 @@ def getStreamParams(args, html):
         result['url'] = "https://www.wakanim.tv" + result['url']
     if result['proto'] == "hls":
         # play HLS with Kodi buildin playback
-        return {'legacy': True, 'url': result['url'] + getCookie(args), 'content-type': "application/vnd.apple.mpegurl", 'properties': {}}
+        return {'legacy': True, 'url': result['url'] + getCookies(args), 'content-type': "application/vnd.apple.mpegurl", 'properties': {}}
     if result['proto'] == "dash":
         m = re.search(r"manifest=(.+?)\&", result['url'])
         if m: result['url'] = unquote(m.group(1))
@@ -223,7 +223,7 @@ def getStreamParams(args, html):
 
     # prepare parameters for InputStream Adaptive
     a = "inputstream.adaptive"
-    params = {'inputstreamaddon': a, a+'.stream_headers': getCookie(args)[1:], a+'.manifest_type': result['proto']}
+    params = {'inputstreamaddon': a, a+'.stream_headers': getCookies(args)[1:], a+'.manifest_type': result['proto']}
     if result['drm']:
         params[a+'.license_type'] = result['drm']
         headers = ""
