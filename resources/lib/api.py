@@ -89,9 +89,8 @@ def getPage(args, url, data=None):
     response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/account/login?ReturnUrl=" + quote_plus(url.replace("https://www.wakanim.tv", "")),
                        post_data.encode(getCharset(response)))
 
-    # post data again
-    if data:
-        response = urlopen(url, data)
+    # get page again
+    response = urlopen(url, data)
     html = getHTML(response)
 
     if isLoggedin(html):
