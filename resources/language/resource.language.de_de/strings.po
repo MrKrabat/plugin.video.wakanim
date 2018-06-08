@@ -117,5 +117,5 @@ msgid "You need to be logged in"
 msgstr "Du musst eingeloggt sein"
 
 msgctxt "#30047"
-msgid "Due to security reasons a verification link has been send to your wakanim email account"
-msgstr "Aus Sicherheitsgründen wurde ein Bestätigungslink an deinen Wakanim E-Mail Account gesendet"
+msgid "Due to security reasons a verification link has been send to your wakanim email account.\nRestart the addon after confirming this link."
+msgstr "Aus Sicherheitsgründen wurde ein Bestätigungslink an deinen Wakanim E-Mail Account gesendet.\nStarten Sie das Addon neu, nachdem Sie den Link bestätigt haben."
