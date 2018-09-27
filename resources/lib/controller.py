@@ -21,9 +21,10 @@ import time
 import json
 from bs4 import BeautifulSoup
 try:
-    from urllib2 import urlopen, Request
+    from urllib2 import urlopen, Request, URLError
 except ImportError:
     from urllib.request import urlopen, Request
+    from urllib.error import URLError
 
 import xbmc
 import xbmcgui
