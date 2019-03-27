@@ -57,7 +57,7 @@ def start(args):
         # cookie file does not exist
         pass
 
-    args._cj.set_cookie(Cookie(0, "timezoneoffset", str(timezone/60), None, False, "www.wakanim.tv", False, False, "/", True, False, None, False, None, None, {"HttpOnly": None}, False))
+    args._cj.set_cookie(Cookie(0, "timezoneoffset", str(timezone//60), None, False, "www.wakanim.tv", False, False, "/", True, False, None, False, None, None, {"HttpOnly": None}, False))
 
 
 def close(args):
