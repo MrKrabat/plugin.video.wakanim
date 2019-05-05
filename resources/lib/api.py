@@ -85,14 +85,21 @@ def getPage(args, url, data=None):
     # get account informations
     username = args._addon.getSetting("wakanim_username")
     password = args._addon.getSetting("wakanim_password")
+    logindict = {"Username":   username,
+                 "Password":   password,
+                 "RememberMe": True,
+                 "login":      "Verbindung"}
 
-    # build POST data
-    post_data = urlencode({"Username":   username,
-                           "Password":   password,
-                           "RememberMe": True,
-                           "login":      "Verbindung"})
+    # get security tokens
+    soup = BeautifulSoup(html, "html.parser")
+    form = soup.find_all("form", {"class": "nav-user_login"})[0]
+    for input in form.find_all("input", {"type": "hidden"}):
+        if input.get("name") == u"RememberMe":
+            continue
+        logindict[input.get("name")] = input.get("value")
 
     # POST to login page
+    post_data = urlencode(logindict)
     response = urlopen("https://www.wakanim.tv/" + args._country + "/v2/account/login?ReturnUrl=" + quote_plus(url.replace("https://www.wakanim.tv", "")),
                        post_data.encode(getCharset(response)))
 
