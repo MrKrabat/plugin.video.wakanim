@@ -93,10 +93,10 @@ def getPage(args, url, data=None):
     # get security tokens
     soup = BeautifulSoup(html, "html.parser")
     form = soup.find_all("form", {"class": "nav-user_login"})[0]
-    for input in form.find_all("input", {"type": "hidden"}):
-        if input.get("name") == u"RememberMe":
+    for inputform in form.find_all("input", {"type": "hidden"}):
+        if inputform.get("name") == u"RememberMe":
             continue
-        logindict[input.get("name")] = input.get("value")
+        logindict[inputform.get("name")] = inputform.get("value")
 
     # POST to login page
     post_data = urlencode(logindict)
