@@ -333,13 +333,12 @@ def listSeason(args):
     soup = BeautifulSoup(html, "html.parser")
 
     # get values
-    date = soup.find_all("span", {"class": "border-list_text"})[0].find_all("span")
+    date = soup.find_all("span", {"class": "border-list_text"})[1].find_all("span")
     year = date[2].string.strip()
     date = year + "-" + date[1].string.strip() + "-" + date[0].string.strip()
-    originaltitle = soup.find_all("span", {"class": "border-list_text"})[1].string.strip()
-    plot = soup.find("div", {"class": "serie_description"}).get_text().strip()
-    credit = soup.find("div", {"class": "serie_description_more"})
-    credit = credit.p.get_text().strip() if credit else ""
+    originaltitle = soup.find_all("span", {"class": "border-list_text"})[2].string.strip()
+    plot = soup.find_all("span", {"class": "border-list_text"})[0].string.strip()
+    credit = soup.find_all("span", {"class": "border-list_text"})[5].string.strip()
     trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
     try:
         # get YouTube trailer
@@ -355,21 +354,34 @@ def listSeason(args):
     except AttributeError:
         trailer = ""
 
+    # get season infos
+    newURL = soup.find_all("a", {"class": "SerieNav-btn"})[1]["href"]
+
+    # get website
+    html = api.getPage(args, "https://www.wakanim.tv" + newURL)
+    if not html:
+        view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
+        view.endofdirectory(args)
+        return
+
+    # parse html
+    soup = BeautifulSoup(html, "html.parser")
+
     # for every list entry
-    for section in soup.find_all("h2", {"class": "slider-section_title"}):
+    container = soup.find("div", {"id": "list-season-container"})
+    for option in container.find_all("option"):
         # get values
-        if not section.span:
+        if not option["value"]:
             continue
-        title = section.get_text()[6:].strip()
 
         # add to view
         view.add_item(args,
-                      {"url":           args.url,
-                       "title":         title,
+                      {"url":           option["value"],
+                       "title":         option.string.strip(),
                        "mode":          "list_episodes",
                        "thumb":         args.thumb.replace(" ", "%20"),
                        "fanart":        args.fanart.replace(" ", "%20"),
-                       "season":        title,
+                       "season":        option.string.strip(),
                        "plot":          plot,
                        "plotoutline":   getattr(args, "plot", ""),
                        "year":          year,
@@ -395,32 +407,23 @@ def listEpisodes(args):
     # parse html
     soup = BeautifulSoup(html, "html.parser")
 
-    # for every season
-    for section in soup.find_all("section", {"class": "seasonSection"}):
-        # get values
-        season = section.find("h2", {"class": "slider-section_title"}).get_text().split("%", 1)[1].strip()
-        if view.quote_value(season, args.PY2) != view.quote_value(args.title, args.PY2):
-            continue
+    # for every episode
+    for li in soup.find_all("div", {"class": "slider_item_inner"}):
+        progress = int(li.find("div", {"class": "ProgressBar"}).get("data-progress"))
+        thumb = li.img["src"].replace(" ", "%20")
+        if thumb[:4] != "http":
+            thumb = "https:" + thumb
 
-        # for every episode
-        for li in section.find_all("li", {"class": "slider_item"}):
-            progress = int(li.find("div", {"class": "ProgressBar"}).get("data-progress"))
-            thumb = li.img["src"].replace(" ", "%20")
-            if thumb[:4] != "http":
-                thumb = "https:" + thumb
-
-            # add to view
-            view.add_item(args,
-                          {"url":       li.a["href"],
-                           "title":     li.img["alt"],
-                           "mode":      "videoplay",
-                           "thumb":     thumb.replace(" ", "%20"),
-                           "fanart":    args.fanart.replace(" ", "%20"),
-                           "playcount": "1" if progress > 90 else "0",
-                           "progress":  str(progress)},
-                          isFolder=False, mediatype="video")
-
-        break
+        # add to view
+        view.add_item(args,
+                      {"url":       li.a["href"],
+                       "title":     li.img["alt"],
+                       "mode":      "videoplay",
+                       "thumb":     thumb.replace(" ", "%20"),
+                       "fanart":    args.fanart.replace(" ", "%20"),
+                       "playcount": "1" if progress > 90 else "0",
+                       "progress":  str(progress)},
+                      isFolder=False, mediatype="video")
 
     view.endofdirectory(args)
 
