@@ -193,8 +193,6 @@ def getStreamParams(args, html):
         # play HLS with Kodi buildin playback
         return {'legacy': True, 'url': result['url'] + getCookies(args), 'content-type': "application/vnd.apple.mpegurl", 'properties': {}}
     if result['proto'] == "dash":
-        m = re.search(r"manifest=(.+?)\&", result['url'])
-        if m: result['url'] = unquote(m.group(1))
         result['proto'] = "mpd"
         result['content-type'] = "application/dash+xml"
     else:
