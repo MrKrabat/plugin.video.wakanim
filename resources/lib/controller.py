@@ -278,7 +278,10 @@ def listSeason(args):
     year = date[2].string.strip()
     date = year + "-" + date[1].string.strip() + "-" + date[0].string.strip()
     originaltitle = soup.find_all("span", {"class": "border-list_text"})[2].string.strip()
-    plot = soup.find_all("span", {"class": "border-list_text"})[0].string.strip()
+    try:
+        plot = soup.find_all("span", {"class": "border-list_text"})[0].string.strip()
+    except AttributeError:
+        plot = str(soup.find_all("span", {"class": "border-list_text"})[0])
     credit = soup.find_all("span", {"class": "border-list_text"})[6].string.strip()
     trailer = soup.find("a", {"class": "trailer"})
     if trailer:
