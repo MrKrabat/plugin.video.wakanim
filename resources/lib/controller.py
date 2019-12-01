@@ -287,11 +287,10 @@ def listSeason(args):
     originaltitle = soup.find_all("span", {"class": "border-list_text"})[2].string.strip()
     plot = soup.find_all("span", {"class": "border-list_text"})[0].string.strip()
     credit = soup.find_all("span", {"class": "border-list_text"})[6].string.strip()
-    trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
-    try:
+    trailer = soup.find("a", {"class": "trailer"})
+    if trailer:
         # get YouTube trailer
-        trailer = trailer.iframe["src"]
-        trailer = "plugin://plugin.video.youtube/play/?video_id=" + re.search(r"(?:\.be/|/embed)/?([^&=%:/\?]{11})", trailer).group(1)
+        trailer = "plugin://plugin.video.youtube/play/?video_id=" + re.search(r"(?:\.be/|/embed)/?([^&=%:/\?]{11})", trailer["href"]).group(1)
         view.add_item(args,
                       {"url":    trailer,
                        "mode":   "trailer",
@@ -299,7 +298,7 @@ def listSeason(args):
                        "fanart": args.fanart.replace(" ", "%20"),
                        "title":  args._addon.getLocalizedString(30024)},
                       isFolder=False, mediatype="video")
-    except AttributeError:
+    else:
         trailer = ""
 
     # get season infos
