@@ -338,7 +338,7 @@ def listSeason(args):
     date = year + "-" + date[1].string.strip() + "-" + date[0].string.strip()
     originaltitle = soup.find_all("span", {"class": "border-list_text"})[2].string.strip()
     plot = soup.find_all("span", {"class": "border-list_text"})[0].string.strip()
-    credit = soup.find_all("span", {"class": "border-list_text"})[5].string.strip()
+    credit = soup.find_all("span", {"class": "border-list_text"})[6].string.strip()
     trailer = soup.find("div", {"class": "TrailerEp-iframeWrapperRatio"})
     try:
         # get YouTube trailer
