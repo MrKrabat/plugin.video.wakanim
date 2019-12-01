@@ -21,6 +21,10 @@ import time
 import json
 from bs4 import BeautifulSoup
 try:
+    from urllib import urlencode, quote_plus
+except ImportError:
+    from urllib.parse import urlencode, quote_plus
+try:
     from urllib2 import urlopen, Request, URLError
 except ImportError:
     from urllib.request import urlopen, Request
@@ -170,36 +174,40 @@ def searchAnime(args):
 
     # get website
     html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", {"search": d})
-    xbmc.log(html.encode('utf-8'), xbmc.LOGERROR)
 
-    # parse html
-    soup = BeautifulSoup(html, "html.parser")
-    ul = soup.find("ul", {"class": "catalog_list"})
-    if not ul:
-        view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
-        view.endofdirectory(args)
-        return
+    # get JWT token
+    regex = r"var token = '(.*?)';"
+    matches = re.search(regex, html)
+    token = matches.group(1)
+
+    # get search results
+    req = urlopen("https://apiwaka.azure-api.net/search/v2/?search=" + quote_plus(d) + "&token=" + quote_plus(token))
+    search = json.loads(req.read())
 
     # for every list entry
-    for li in ul.find_all("li"):
+    for item in search["value"]:
         # get values
-        plot  = li.find("p", {"class": "tooltip_text"})
-        stars = li.find("div", {"class": "stars"})
-        star  = stars.find_all("span", {"class": "-no"})
-        thumb = li.img["src"].replace(" ", "%20")
+        plot  = item["Synopsis"]
+        star  = item["RatingNote"]
+        thumb = item["Image"].replace(" ", "%20")
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
         # add to view
         view.add_item(args,
-                      {"url":    li.a["href"],
-                       "title":  li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
-                       "mode":   "list_season",
-                       "thumb":  thumb,
-                       "fanart": thumb,
-                       "rating": str(10 - len(star) * 2),
-                       "plot":   plot.contents[3].string.strip(),
-                       "year":   li.time.string.strip()},
+                      {"url":           "/" + args._country + "/v2/catalogue/show/" + item["IdShowItem"],
+                       "title":         item["Name"],
+                       "tvshowtitle":   item["Name"],
+                       "originaltitle": item["OriginalName"],
+                       "mode":          "list_season",
+                       "thumb":         item["Image"],
+                       "fanart":        item["Image"],
+                       "rating":        item["RatingNote"],
+                       "plot":          item["Synopsis"],
+                       "plotoutline":   item["SmallSummary"],
+                       "premiered":     item["StartDate"],
+                       "credits":       item["Copyright"],
+                       "year":          item["YearStartBroadcasting"]},
                       isFolder=True, mediatype="video")
 
     view.endofdirectory(args)
