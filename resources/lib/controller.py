@@ -21,9 +21,9 @@ import time
 import json
 from bs4 import BeautifulSoup
 try:
-    from urllib import urlencode, quote_plus
+    from urllib import quote_plus
 except ImportError:
-    from urllib.parse import urlencode, quote_plus
+    from urllib.parse import quote_plus
 try:
     from urllib2 import urlopen, Request, URLError
 except ImportError:
@@ -186,13 +186,6 @@ def searchAnime(args):
 
     # for every list entry
     for item in search["value"]:
-        # get values
-        plot  = item["Synopsis"]
-        star  = item["RatingNote"]
-        thumb = item["Image"].replace(" ", "%20")
-        if thumb[:4] != "http":
-            thumb = "https:" + thumb
-
         # add to view
         view.add_item(args,
                       {"url":           "/" + args._country + "/v2/catalogue/show/" + item["IdShowItem"],
@@ -479,7 +472,7 @@ def startplayback(args):
                             "PlayTime":        player.getTime(),
                             "Duration":        player.getTotalTime(),
                             "TotalPlayedTime": 4,
-                            "FromSVOD":        "true"}
+                            "FromSVOD":        "false"}
 
                     # send data
                     try:
