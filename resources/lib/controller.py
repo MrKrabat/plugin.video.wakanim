@@ -170,6 +170,7 @@ def searchAnime(args):
 
     # get website
     html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", {"search": d})
+    xbmc.log(html.encode('utf-8'), xbmc.LOGERROR)
 
     # parse html
     soup = BeautifulSoup(html, "html.parser")
@@ -204,46 +205,6 @@ def searchAnime(args):
     view.endofdirectory(args)
 
 
-def myWatchlist(args):
-    """Show all episodes on watchlist
-    """
-    # get website
-    html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/watchlist")
-    if not html:
-        view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
-        view.endofdirectory(args)
-        return
-
-    # parse html
-    soup = BeautifulSoup(html, "html.parser")
-    section = soup.find("section")
-    if not section:
-        view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
-        view.endofdirectory(args)
-        return
-
-    # for every list entry
-    for div in section.find_all("div", {"class": "slider_item"}):
-        # get values
-        progress = int(div.find("div", {"class": "ProgressBar"}).get("data-progress"))
-        thumb = div.img["src"].replace(" ", "%20")
-        if thumb[:4] != "http":
-            thumb = "https:" + thumb
-
-        # add to view
-        view.add_item(args,
-                      {"url":       div.find("div", {"class": "slider_item_inner"}).a["href"],
-                       "title":     div.img["alt"],
-                       "mode":      "videoplay",
-                       "thumb":     thumb.replace(" ", "%20"),
-                       "fanart":    thumb.replace(" ", "%20"),
-                       "playcount": "1" if progress > 90 else "0",
-                       "progress":  str(progress)},
-                      isFolder=False, mediatype="video")
-
-    view.endofdirectory(args)
-
-
 def myDownloads(args):
     """View download able animes
     May not every episode is download able.
@@ -273,43 +234,6 @@ def myDownloads(args):
         # add to view
         view.add_item(args,
                       {"url":    div.a["href"].replace("mydownloads/detail", "catalogue/show"),
-                       "title":  div.find("h3", {"class": "big-item_title"}).string.strip(),
-                       "mode":   "list_season",
-                       "thumb":  thumb,
-                       "fanart": thumb},
-                      isFolder=True, mediatype="video")
-
-    view.endofdirectory(args)
-
-
-def myCollection(args):
-    """View collection
-    """
-    # get website
-    html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/collection")
-    if not html:
-        view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
-        view.endofdirectory(args)
-        return
-
-    # parse html
-    soup = BeautifulSoup(html, "html.parser")
-    container = soup.find("div", {"class": "big-item-list"})
-    if not container:
-        view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
-        view.endofdirectory(args)
-        return
-
-    # for every list entry
-    for div in container.find_all("div", {"class": "big-item-list_item"}):
-        # get values
-        thumb = div.img["src"].replace(" ", "%20")
-        if thumb[:4] != "http":
-            thumb = "https:" + thumb
-
-        # add to view
-        view.add_item(args,
-                      {"url":    div.a["href"].replace("collection/detail", "catalogue/show"),
                        "title":  div.find("h3", {"class": "big-item_title"}).string.strip(),
                        "mode":   "list_season",
                        "thumb":  thumb,
