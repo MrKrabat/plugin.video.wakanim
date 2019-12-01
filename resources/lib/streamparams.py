@@ -18,9 +18,9 @@
 import re
 import json
 try:
-    from urllib import unquote, urlencode
+    from urllib import urlencode
 except ImportError:
-    from urllib.parse import unquote, urlencode
+    from urllib.parse import urlencode
 
 import xbmc
 import xbmcgui
