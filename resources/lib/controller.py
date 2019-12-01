@@ -254,12 +254,28 @@ def myDownloads(args):
 def listSeason(args):
     """Show all seasons/arcs of an anime
     """
+    # get showid
+    regex = r"\/show\/([0-9]*)"
+    matches = re.search(regex, args.url)
+    showid = matches.group(1)
+
     # get website
-    html = api.getPage(args, "https://www.wakanim.tv" + args.url)
+    html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/show/" + showid)
     if not html:
         view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
         view.endofdirectory(args)
         return
+
+    # check if redirected
+    matches = re.search(regex, html)
+    if not matches.group(1) == showid:
+        # get website
+        showid = matches.group(1)
+        html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/show/" + showid)
+        if not html:
+            view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
+            view.endofdirectory(args)
+            return
 
     # parse html
     soup = BeautifulSoup(html, "html.parser")
