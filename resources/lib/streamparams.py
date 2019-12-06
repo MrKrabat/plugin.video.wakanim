@@ -16,11 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 import json
-try:
-    from urllib import urlencode
-except ImportError:
+
+PY3 = sys.version_info.major >= 3
+if PY3:
     from urllib.parse import urlencode
+else:
+    from urllib import urlencode
 
 import xbmc
 import xbmcgui

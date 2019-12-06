@@ -16,19 +16,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import sys
 import ssl
 import time
 import json
 from bs4 import BeautifulSoup
-try:
-    from urllib import quote_plus
-except ImportError:
+
+PY3 = sys.version_info.major >= 3
+if PY3:
     from urllib.parse import quote_plus
-try:
-    from urllib2 import urlopen, Request, URLError
-except ImportError:
     from urllib.request import urlopen, Request
     from urllib.error import URLError
+else:
+    from urllib import quote_plus
+    from urllib2 import urlopen, Request, URLError
 
 import xbmc
 import xbmcgui
