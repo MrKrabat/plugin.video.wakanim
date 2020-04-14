@@ -67,8 +67,8 @@ def showCatalog(args):
         # add to view
         view.add_item(args,
                       {"url":         li.a["href"],
-                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
-                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
+                       "title":       li.find("p", {"class": "tooltip_title"}).string.strip(),
+                       "tvshowtitle": li.find("p", {"class": "tooltip_title"}).string.strip(),
                        "mode":        "list_season",
                        "thumb":       thumb,
                        "fanart":      thumb,
