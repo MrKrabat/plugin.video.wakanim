@@ -67,13 +67,13 @@ def showCatalog(args):
         # add to view
         view.add_item(args,
                       {"url":         li.a["href"],
-                       "title":       li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
-                       "tvshowtitle": li.find("div", {"class": "slider_item_description"}).span.strong.string.strip(),
+                       "title":       li.find("p", {"class": "tooltip_title"}).string.strip(),
+                       "tvshowtitle": li.find("p", {"class": "tooltip_title"}).string.strip(),
                        "mode":        "list_season",
                        "thumb":       thumb,
                        "fanart":      thumb,
                        "rating":      str(10 - len(star) * 2),
-                       "plot":        plot.contents[3].string.strip(),
+                       "plot":        plot.contents[-1].string.strip(),
                        "year":        li.time.string.strip()},
                       isFolder=True, mediatype="video")
 
