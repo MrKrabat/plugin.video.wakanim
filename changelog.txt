@@ -1,3 +1,6 @@
+v1.0.0 (2020.09.01)
+- Update for Kodi 19 Matrix
+
 v0.8.1 (2020.09.01)
 - Fix Wakanim website changes
 
