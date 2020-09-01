@@ -229,7 +229,7 @@ def myDownloads(args):
     # for every list entry
     for div in container.find_all("div", {"class": "big-item-list_item"}):
         # get values
-        thumb = div.img["data-src"].replace(" ", "%20")
+        thumb = div.img["src"].replace(" ", "%20")
         if thumb[:4] != "http":
             thumb = "https:" + thumb
 
