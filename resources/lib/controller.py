@@ -206,7 +206,7 @@ def searchAnime(args):
                        "plotoutline":   item["SmallSummary"],
                        "premiered":     item["StartDate"],
                        "credits":       item["Copyright"],
-                       "yea":          item["YearStartBroadcasting"]},
+                       "year":          item["YearStartBroadcasting"]},
                       isFolder=True, mediatype="video")
 
     view.endofdirectory(args)
