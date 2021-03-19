@@ -217,7 +217,7 @@ def getStreamParams(args, html):
 
     # prepare parameters for InputStream Adaptive
     a = "inputstream.adaptive"
-    params = {'inputstreamaddon': a, a+'.stream_headers': getCookies(args)[1:], a+'.manifest_type': result['proto']}
+    params = {'inputstream': a, a+'.stream_headers': getCookies(args)[1:], a+'.manifest_type': result['proto']}
     if result['drm']:
         params[a+'.license_type'] = result['drm']
         headers = ""

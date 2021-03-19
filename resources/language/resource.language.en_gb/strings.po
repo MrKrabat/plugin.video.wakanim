@@ -119,3 +119,11 @@ msgstr ""
 msgctxt "#30047"
 msgid "Due to security reasons a verification link has been send to your wakanim email account.\nRestart the addon after confirming this link."
 msgstr ""
+
+msgctxt "#30048"
+msgid "The theme is : "
+msgstr ""
+
+msgctxt "#30049"
+msgid "Does this image relate to the theme ?"
+msgstr ""
