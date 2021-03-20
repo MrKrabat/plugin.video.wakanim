@@ -3,6 +3,8 @@ import xbmcvfs
 import xbmcgui
 import xbmc
 
+addon = xbmcaddon.Addon(id='plugin.video.wakanim')
+
 class cInputWindow(xbmcgui.WindowDialog):
 
     chkbutton = []
@@ -20,7 +22,7 @@ class cInputWindow(xbmcgui.WindowDialog):
         self.cancelled = False
         self.addControl(self.ctrlBackground)
 
-        self.strActionInfo = xbmcgui.ControlLabel(250, 20, 724, 400, xbmc.getLocalizedString(30048) + kwargs.get('msg'), 'font40', '0xFFFF00FF')
+        self.strActionInfo = xbmcgui.ControlLabel(250, 20, 724, 400, addon.getLocalizedString(30048) + kwargs.get('msg'), 'font40', '0xFFFF00FF')
         self.addControl(self.strActionInfo)
 
         self.img = xbmcgui.ControlImage(250, 110, 780, 499, str(self.cptloc))
