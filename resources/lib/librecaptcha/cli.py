@@ -173,10 +173,10 @@ class Cli(Frontend):
 
         # Recupere le theme de maniere plus precis.
         if (int(json.dumps(meta).split(',')[3]) * int(json.dumps(meta).split(',')[4]) > 9):
-        	try:
-            	Objectif = Objectif[1].encode('utf-8').decode('unicode-escape')
+            try:
+                Objectif = Objectif[1].encode('utf-8').decode('unicode-escape')
             except:
-            	Objectif = Objectif[0].encode('utf-8').decode('unicode-escape')
+                Objectif = Objectif[0].encode('utf-8').decode('unicode-escape')
         else:
             Objectif = Objectif[0].encode('utf-8').decode('unicode-escape')
 
