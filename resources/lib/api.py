@@ -89,7 +89,15 @@ def getPage(args, url, data=None):
     username = args._addon.getSetting("wakanim_username")
     password = args._addon.getSetting("wakanim_password")
 
-    if 'Incapsula incident' in html:
+    if '/_Incapsula_Resource?' in html:
+        if not "iframe" in html:
+            #Auto remove cookie and wait because of the protection
+            xbmc.log("[PLUGIN] %s: Cookie Removed '%s'" % (args._addonname), xbmc.LOGERROR)
+            xbmcvfs.delete(args._addon.getAddonInfo("profile") + "/cookies.lwp")
+            xbmc.sleep(5000)
+
+            response = urlopen(url, data)
+            html = getHTML(response)
 
         urlCaptcha = "https://www.wakanim.tv" + re.search('<iframe id="main-iframe" src="(.+?)"',html).group(1)
         response = urlopen(urlCaptcha)
@@ -116,6 +124,7 @@ def getPage(args, url, data=None):
 
     # get security tokens
     form = re.search('class="nav-user_login(.+?)nav-user_login_link"',html,re.DOTALL|re.MULTILINE).group(1)
+
     form = re.findall('<input type="hidden" name="([^"]+)" value="([^"]+)" />',form)
     for inputform in form:
         logindict[inputform[0]] = inputform[1]
