@@ -32,11 +32,13 @@ except:
 import json
 import time
 import xbmcvfs, re, xbmc
+import xbmcaddon
 
 Objectif = ""
 DimTab = []
 STRINGS_PATH = 'special://home/userdata/addon_data/plugin.video.wakanim'
 
+addon = xbmcaddon.Addon(id='plugin.video.wakanim')
 
 class CliSolver(object):
     def __init__(self, solver):
@@ -77,7 +79,7 @@ class CliDynamicSolver(CliSolver):
         solver.finish()
 
     def show_imageNewTile(self, image):
-        oSolver = cInputWindowYesNo(captcha=image, msg=xbmc.getLocalizedString(30049), roundnum=1)
+        oSolver = cInputWindowYesNo(captcha=image, msg=addon.getLocalizedString(30049), roundnum=1)
         retArg = oSolver.get()
         return retArg
 
