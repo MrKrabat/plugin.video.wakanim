@@ -179,7 +179,7 @@ def getStreamParams(args, html):
         # try parse with JSON
         result = get_stream_params_from_json(parse_stream_config(html, "jwplayer(\"jwplayer-container\").setup({"))
     except (ValueError, KeyError, TypeError):
-        log(args, "Error parsing JWPlayer config, trying old method", xbmc.LOGNOTICE)
+        log(args, "Error parsing JWPlayer config, trying old method", xbmc.LOGINFO)
         # fallback to old method
         result = get_stream_params_fallback(html)
     if not result:
@@ -199,11 +199,11 @@ def getStreamParams(args, html):
         result['proto'] = "mpd"
         result['content-type'] = "application/dash+xml"
     else:
-        log(args, "Unknown stream protocol '{0}'".format(result['proto']), xbmc.LOGNOTICE)
+        log(args, "Unknown stream protocol '{0}'".format(result['proto']), xbmc.LOGINFO)
     if result['drm'] == "widevine":
         result['drm'] = "com.widevine.alpha"
     else:
-        log(args, "Unknown stream license type '{0}'".format(result['drm']), xbmc.LOGNOTICE)
+        log(args, "Unknown stream license type '{0}'".format(result['drm']), xbmc.LOGINFO)
 
     # check stream parameters with InputStreamHelper
     try:
