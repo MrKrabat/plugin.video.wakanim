@@ -123,11 +123,12 @@ def getPage(args, url, data=None):
                  "login":      ""}
 
     # get security tokens
-    form = re.search('class="nav-user_login(.+?)nav-user_login_link"',html,re.DOTALL|re.MULTILINE).group(1)
-
-    form = re.findall('<input type="hidden" name="([^"]+)" value="([^"]+)" />',form)
-    for inputform in form:
-        logindict[inputform[0]] = inputform[1]
+    soup = BeautifulSoup(html, "html.parser")
+    form = soup.find_all("form", {"class": "nav-user_login"})[0]
+    for inputform in form.find_all("input", {"type": "hidden"}):
+        if inputform.get("name") == u"RememberMe":
+            continue
+        logindict[inputform.get("name")] = inputform.get("value")
 
     # POST to login page
     post_data = urlencode(logindict)
