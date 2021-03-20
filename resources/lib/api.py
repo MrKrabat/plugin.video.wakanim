@@ -92,7 +92,7 @@ def getPage(args, url, data=None):
     if '/_Incapsula_Resource?' in html:
         if not "iframe" in html:
             #Auto remove cookie and wait because of the protection
-            xbmc.log("[PLUGIN] %s: Cookie Removed '%s'" % (args._addonname), xbmc.LOGERROR)
+            xbmc.log("[PLUGIN] %s: Cookie Removed" % (args._addonname), xbmc.LOGERROR)
             xbmcvfs.delete(args._addon.getAddonInfo("profile") + "/cookies.lwp")
             xbmc.sleep(5000)
 
