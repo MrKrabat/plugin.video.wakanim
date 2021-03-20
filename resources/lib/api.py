@@ -140,7 +140,7 @@ def getPage(args, url, data=None):
 
     # 2FA required
     if "/v2/client/authorizewebclient" in html:
-        xbmc.log("[PLUGIN] %s: 2FA required" % args._addonname, xbmc.LOGNOTICE)
+        xbmc.log("[PLUGIN] %s: 2FA required" % args._addonname, xbmc.LOGINFO)
         soup = BeautifulSoup(html, "html.parser")
         RequestVerificationToken = soup.find("input", {"name": "__RequestVerificationToken"})["value"]
 
