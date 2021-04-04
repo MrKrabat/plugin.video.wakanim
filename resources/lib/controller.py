@@ -45,6 +45,7 @@ def showCatalog(args):
     """
     # get website
     html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue")
+
     if not html:
         view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
         view.endofdirectory(args)
@@ -92,7 +93,7 @@ def listLastEpisodes(args):
 
     # parse html
     soup = BeautifulSoup(html, "html.parser")
-    container = soup.find("div", {"class": "js-slider-lastEp"})
+    container = soup.find("div", {"class": "slider js-slider js-slider-lastEp"})
     if not container:
         view.add_item(args, {"title": args._addon.getLocalizedString(30041)})
         view.endofdirectory(args)
@@ -101,7 +102,11 @@ def listLastEpisodes(args):
     # for every list entry
     for li in container.find_all("li"):
         # get values
-        progress = int(li.find("div", {"class": "ProgressBar"}).get("data-progress"))
+        try:
+          progress = int(li.find("div", {"class": "ProgressBa"}).get("data-progress"))
+        except:
+          progress = 0
+          
         thumb = li.img["data-src"].replace(" ", "%20")
         if thumb[:4] != "http":
             thumb = "https:" + thumb
@@ -177,7 +182,7 @@ def searchAnime(args):
     html = api.getPage(args, "https://www.wakanim.tv/" + args._country + "/v2/catalogue/search", {"search": d})
 
     # get JWT token
-    regex = r"var token = '(.*?)';"
+    regex = "var token = '(.*?)';"
     matches = re.search(regex, html)
     token = matches.group(1)
 
@@ -370,6 +375,7 @@ def listEpisodes(args):
                       isFolder=False, mediatype="video")
 
     view.endofdirectory(args)
+
 
 
 def startplayback(args):

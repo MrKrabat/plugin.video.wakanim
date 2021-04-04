@@ -108,3 +108,11 @@ msgstr "Impossible de lire la vidéo"
 msgctxt "#30045"
 msgid "Do you want to continue watching at %s%%?"
 msgstr "Voulez-vous continuer à regarder à partir de %s%%?"
+
+msgctxt "#30048"
+msgid "The theme is : "
+msgstr "Le theme est : "
+
+msgctxt "#30049"
+msgid "Does this image relate to the theme ?"
+msgstr "Est-ce que cette image est en lien avec le thème ?"

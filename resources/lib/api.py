@@ -31,9 +31,12 @@ else:
     from urllib2 import urlopen, build_opener, HTTPCookieProcessor, install_opener
     from cookielib import LWPCookieJar, Cookie
 
+import xbmcvfs
 import xbmc
 import xbmcgui
+import re
 
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36"
 
 def start(args):
     """Login and session handler
@@ -73,6 +76,7 @@ def getPage(args, url, data=None):
     if data:
         data = urlencode(data).encode("utf-8")
 
+    # check if loggedin
     # get page
     response = urlopen(url, data)
     html = getHTML(response)
@@ -84,10 +88,39 @@ def getPage(args, url, data=None):
     # get account informations
     username = args._addon.getSetting("wakanim_username")
     password = args._addon.getSetting("wakanim_password")
+
+    if '/_Incapsula_Resource?' in html:
+        if not "iframe" in html:
+            #Auto remove cookie and wait because of the protection
+            xbmc.log("[PLUGIN] %s: Cookie Removed" % (args._addonname), xbmc.LOGERROR)
+            xbmcvfs.delete(args._addon.getAddonInfo("profile") + "/cookies.lwp")
+            xbmc.sleep(5000)
+
+            response = urlopen(url, data)
+            html = getHTML(response)
+
+        urlCaptcha = "https://www.wakanim.tv" + re.search('<iframe id="main-iframe" src="(.+?)"',html).group(1)
+        response = urlopen(urlCaptcha)
+        html = getHTML(response)
+
+        sUrl = "https://www.wakanim.tv" + re.search('"POST"\, "(.+?)"',html).group(1)
+
+        from resources.lib import librecaptcha
+        test = librecaptcha.get_token(api_key="6Ld38BkUAAAAAPATwit3FXvga1PI6iVTb6zgXw62", site_url=urlCaptcha, user_agent=UA,
+                                      gui=False, debug=False)
+
+        logindict = {"g-recaptcha-response" : test}
+        dataCap = urlencode(logindict)
+        response = urlopen(sUrl, dataCap.encode(getCharset(response)))
+        html = getHTML(response)
+
+        response = urlopen(url)
+        html = getHTML(response)
+
     logindict = {"Username":   username,
                  "Password":   password,
                  "RememberMe": True,
-                 "login":      "Verbindung"}
+                 "login":      ""}
 
     # get security tokens
     soup = BeautifulSoup(html, "html.parser")
@@ -107,8 +140,8 @@ def getPage(args, url, data=None):
     html = getHTML(response)
 
     # 2FA required
-    if u"/v2/client/authorizewebclient" in html:
-        xbmc.log("[PLUGIN] %s: 2FA required" % args._addonname, xbmc.LOGNOTICE)
+    if "/v2/client/authorizewebclient" in html:
+        xbmc.log("[PLUGIN] %s: 2FA required" % args._addonname, xbmc.LOGINFO)
         soup = BeautifulSoup(html, "html.parser")
         RequestVerificationToken = soup.find("input", {"name": "__RequestVerificationToken"})["value"]
 
@@ -139,7 +172,7 @@ def getPage(args, url, data=None):
 def isLoggedin(html):
     """Check if user logged in
     """
-    return u"header-main_user_name" in html
+    return "header-main_user_name" in html
 
 
 def getCookies(args):
@@ -155,9 +188,9 @@ def getCookies(args):
 def getCookiePath(args):
     """Get cookie file path
     """
-    profile_path = xbmc.translatePath(args._addon.getAddonInfo("profile"))
+    profile_path = xbmcvfs.translatePath(args._addon.getAddonInfo("profile"))
     if args.PY2:
-        return os.path.join(profile_path.decode("utf-8"), u"cookies.lwp")
+        return os.path.join(profile_path.decode("utf-8"), "cookies.lwp")
     else:
         return os.path.join(profile_path, "cookies.lwp")
 
